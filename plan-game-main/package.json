@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "phaser": "3.60.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/node": "^22.10.3",

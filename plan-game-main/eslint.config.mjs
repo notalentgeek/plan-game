@@ -1,7 +1,7 @@
 import globals from 'globals';
+import parser from '@typescript-eslint/parser';
 import pluginJs from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
-import parser from '@typescript-eslint/parser';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -9,13 +9,21 @@ export default [
   { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
 
   // Match only desired files
-  { files: ['src/**/*.{ts,tsx,js,mjs,cjs}'], },
+  { files: ['src/**/*.{ts,tsx,js,mjs,cjs}'] },
 
   // Ignore dist and node_modules directories
-  { ignores: ['dist/', 'node_modules/', 'eslint.config.mjs'], },
+  { ignores: ['dist/', 'node_modules/', 'eslint.config.mjs'] },
 
-  // Set browser globals
-  { languageOptions: { globals: globals.node } },
+  // Set browser and node globals
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        Phaser: 'readonly'  // Add Phaser as a readonly global
+      }
+    }
+  },
 
   // Add JavaScript recommended config
   pluginJs.configs.recommended,
@@ -27,7 +35,7 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: './tsconfig.json', // Ensure tsconfig.json matches the files you're linting
+        project: './tsconfig.json',
       },
     },
     plugins: {

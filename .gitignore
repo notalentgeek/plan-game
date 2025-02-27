@@ -57,6 +57,7 @@ coverage/
 *.tsbuildinfo
 
 # Other
+**/assets/
 .cache/
 .eslintcache
 .prettiercache

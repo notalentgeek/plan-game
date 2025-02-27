@@ -1,12 +1,12 @@
 {
   "name": "plan-game-main",
   "version": "1.0.0",
-  "main": "src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "parcel build index.html --dist-dir dist && cp -r assets dist/",
+    "dev": "parcel index.html",
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
-    "start": "npm run lint && tsc && node dist/main.js",
+    "start": "npm run lint && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -25,7 +25,9 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.14.0",
+    "parcel": "^2.10.0",
     "prettier": "^3.4.2",
+    "process": "^0.11.10",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.18.1"
   }

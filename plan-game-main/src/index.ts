@@ -89,10 +89,14 @@ class GameScene extends Phaser.Scene {
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 375, // Common smartphone resolution width
+  width: 375,  // Common smartphone resolution width
   height: 667, // Common smartphone resolution height
+  scale: {
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
   scene: [GameScene],
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const game = new Phaser.Game(config);
+

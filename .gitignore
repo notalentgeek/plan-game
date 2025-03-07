@@ -1,8 +1,8 @@
 # Build Outputs
-build/
-dist/
 .out/
 .outs/
+build/
+dist/
 
 # Bundler Files
 .next/
@@ -20,12 +20,44 @@ node_modules/
 .env
 .env.*.local
 
+# Game Assets (Exclude unoptimized and large assets)
+*.blend
+*.exr
+*.fbx
+*.flac
+*.gltf
+*.glb
+*.ico
+*.kra
+*.mp3
+*.mp4
+*.mov
+*.obj
+*.ogg
+*.psd
+*.tga
+*.tif
+*.tiff
+*.tmp
+*.translation
+*.wav
+*.webm
+*.xcf
+
+# Godot Specific Files
+.android/
+.editor_config
+.export/
+.godot/
+.import/
+.mono/
+
 # IDE And Editor Files
+*.code-workspace
 .idea/
 .project
 .settings/
 .vscode/
-*.code-workspace
 
 # Logs
 *.log
@@ -34,10 +66,21 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Other
+**/assets/
+.cache/
+.eslintcache
+.prettiercache
+.stylelintcache
+
 # Package Manager Files
 .pnpm-debug.log
 package-lock.json
 yarn.lock
+
+# PhaserJS Specific Files
+public/build/
+public/dist/
 
 # System Files
 .DS_Store
@@ -55,10 +98,3 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
-
-# Other
-**/assets/
-.cache/
-.eslintcache
-.prettiercache
-.stylelintcache

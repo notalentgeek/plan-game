@@ -1,4 +1,4 @@
-# game_manager.gd
+# scripts/autoload/game_manager.gd
 # Central controller for the Plan Card Game, managing game state and player turns
 extends Node
 
@@ -11,7 +11,7 @@ enum GameState {
 }
 
 # Signals
-signal game_started()
+signal game_started
 signal player_turn_changed(player_id)
 signal round_ended(scores)
 signal game_ended(champion, final_scores)
@@ -42,8 +42,8 @@ var discard_pile: Array[Card] = []
 
 func _ready() -> void:
 	# Connect signals from card manager
-	card_manager.connect("card_played", Callable(self, "_on_card_played"))
-	card_manager.connect("invalid_play", Callable(self, "_on_invalid_play"))
+	card_manager.card_played.connect(_on_card_played)
+	card_manager.invalid_play.connect(_on_invalid_play)
 
 ## Game Initialization
 
@@ -87,8 +87,17 @@ func start_game() -> void:
 		push_error("Cannot start game: game is not in setup state")
 		return
 
+	# Debug logging
+	print("Starting game with %d players" % players.size())
+	print("Problem deck size: %d" % game_deck["problem"].size())
+	print("Solution deck size: %d" % game_deck["solution"].size())
+
 	# Deal cards to players
 	_deal_initial_cards()
+
+	# More debug logging
+	for i in range(players.size()):
+		print("Player %d has %d cards" % [i, players[i].hand.size()])
 
 	# Set initial problem card
 	var initial_problem = game_deck["problem"].draw_card()
@@ -101,8 +110,8 @@ func start_game() -> void:
 	# Start with the first player
 	current_player_index = 0
 
-	emit_signal("game_started")
-	emit_signal("player_turn_changed", current_player_index)
+	game_started.emit()
+	player_turn_changed.emit(current_player_index)
 
 ## Game Flow Control
 
@@ -117,7 +126,7 @@ func next_turn() -> void:
 	# Move to next player
 	current_player_index = (current_player_index + 1) % players.size()
 
-	emit_signal("player_turn_changed", current_player_index)
+	player_turn_changed.emit(current_player_index)
 
 func end_round() -> void:
 	"""
@@ -134,7 +143,7 @@ func end_round() -> void:
 	for player_id in round_scores:
 		player_scores[player_id] += round_scores[player_id]
 
-	emit_signal("round_ended", round_scores)
+	round_ended.emit(round_scores)
 
 	# Check if game should end
 	if _should_end_game():
@@ -176,7 +185,7 @@ func _prepare_next_round() -> void:
 	# Start with the first player
 	current_player_index = 0
 
-	emit_signal("player_turn_changed", current_player_index)
+	player_turn_changed.emit(current_player_index)
 
 func _end_game() -> void:
 	"""
@@ -192,7 +201,7 @@ func _end_game() -> void:
 			max_score = player_scores[player_id]
 			champion_id = player_id
 
-	emit_signal("game_ended", champion_id, player_scores)
+	game_ended.emit(champion_id, player_scores)
 
 func _should_end_game() -> bool:
 	"""
@@ -294,13 +303,12 @@ func play_multiple_problem_cards(player_id: int, card_indices: Array[int]) -> bo
 
 	if card_manager.play_multiple_problem_cards(player_id, cards):
 		# Remove cards from player's hand in reverse order to avoid index shifting
-		for index in card_indices.duplicate():
-			card_indices.sort()
-			card_indices.reverse()
+		card_indices.sort()
+		card_indices.reverse()
 
 		for index in card_indices:
-			player.remove_card(index)
-			discard_pile.append(cards.pop_front())
+			var card = player.remove_card(index)
+			discard_pile.append(card)
 
 		# Check for CHECKMATE
 		if player.count_problem_cards() == 0:
@@ -353,12 +361,12 @@ func _deal_initial_cards() -> void:
 			var problem_card = game_deck["problem"].draw_card()
 			if problem_card:
 				player.add_card(problem_card)
-				emit_signal("card_dealt", player.id, problem_card)
+				card_dealt.emit(player.id, problem_card)
 
 			var solution_card = game_deck["solution"].draw_card()
 			if solution_card:
 				player.add_card(solution_card)
-				emit_signal("card_dealt", player.id, solution_card)
+				card_dealt.emit(player.id, solution_card)
 
 func _calculate_round_scores() -> Dictionary:
 	"""

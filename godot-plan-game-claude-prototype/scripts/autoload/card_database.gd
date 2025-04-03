@@ -86,12 +86,17 @@ func _initialize_solution_cards() -> void:
 	]
 
 	for solution in solutions:
+		# Convert generic Array to Array[String]
+		var solvable_problems: Array[String] = []
+		for prob in solution[4]:
+			solvable_problems.append(prob)
+
 		var card = SolutionCard.new(
 			solution[0], # id
 			solution[1], # name
 			solution[2], # description
 			solution[3], # texture_path
-			solution[4], # solvable_problems
+			solvable_problems, # solvable_problems (now correctly typed)
 			solution[5] # is_ultimate
 		)
 		solution_cards[card.id] = card

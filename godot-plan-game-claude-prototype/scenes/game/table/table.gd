@@ -17,7 +17,8 @@ func _ready() -> void:
 	self_modulate = table_color
 
 	# Connect signals
-	game_manager.connect("card_played", Callable(self, "_on_card_played"))
+	var card_manager = get_node("/root/CardManager")
+	card_manager.card_played.connect(_on_card_played)
 
 	# Initialize discard count
 	_update_discard_count()

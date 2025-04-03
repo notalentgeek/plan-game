@@ -272,7 +272,7 @@ func _on_card_played(player_id: int, card: Card) -> void:
 	Handle card played event.
 	"""
 	# Update problem display if it's a problem card
-	if card.card_type == Card.CardType.PROBLEM:
+	if card and card.card_type == Card.CardType.PROBLEM:
 		_update_problem_display()
 
 func _on_invalid_play(player_id: int, reason: String) -> void:
@@ -299,12 +299,12 @@ func _update_problem_display() -> void:
 		card_display.set_selectable(false)
 
 func _update_player_hands() -> void:
-	"""
-	Update all player hand displays.
-	"""
+	print("Updating player hands")
 	for i in range(game_manager.players.size()):
 		var player = game_manager.players[i]
 		var hand_container = player_containers[i].get_node("HandContainer")
+
+		print("Player %d has %d cards in hand" % [i, player.hand.size()])
 
 		# Clear existing cards
 		for child in hand_container.get_children():
@@ -312,6 +312,7 @@ func _update_player_hands() -> void:
 
 		# Add cards
 		for card in player.hand:
+			print("Adding card: %s" % card.card_name)
 			var card_display = card_display_scene.instantiate()
 			hand_container.add_child(card_display)
 			card_display.set_card(card)
@@ -321,7 +322,7 @@ func _update_player_hands() -> void:
 
 			# Connect signal for active player's cards
 			if i == active_player_id:
-				card_display.connect("card_clicked", Callable(self, "_on_card_clicked"))
+				card_display.connect("card_clicked", _on_card_clicked)
 
 func _update_turn_indicator() -> void:
 	"""

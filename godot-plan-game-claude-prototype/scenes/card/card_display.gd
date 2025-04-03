@@ -1,4 +1,6 @@
 # Visual representation of a card in the Plan Card Game
+class_name CardDisplay
+# Visual representation of a card in the Plan Card Game
 extends Control
 
 # Signals
@@ -128,7 +130,11 @@ func update_appearance() -> void:
 
 	# Make title bold for ultimate cards
 	if card_data.card_type == Card.CardType.ULTIMATE:
-		title_label.add_theme_font_override("font", preload("res://assets/fonts/bold_font.tres"))
+		var font = SystemFont.new()
+		font.font_names = ["Arial", "Helvetica", "Sans-Serif"]
+		# Use the numeric value for bold weight (700 is standard bold)
+		font.weight = 700 # In Godot 4.4, use 'weight' property directly
+		title_label.add_theme_font_override("font", font)
 	else:
 		title_label.remove_theme_font_override("font")
 

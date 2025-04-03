@@ -1,0 +1,149 @@
+[gd_scene load_steps=4 format=3 uid="uid://dewo1f2e0yx0d"]
+
+[ext_resource type="Script" uid="uid://d3ewtkvrd3rre" path="res://scenes/card/card_display.gd" id="1_7rrye"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qbgra"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 4
+shadow_offset = Vector2(2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ym8n3"]
+bg_color = Color(0.0588235, 0.364706, 0.670588, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="CardDisplay" type="Control"]
+custom_minimum_size = Vector2(180, 250)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 180.0
+offset_bottom = 250.0
+script = ExtResource("1_7rrye")
+
+[node name="CardContainer" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qbgra")
+
+[node name="FrontSide" type="Control" parent="CardContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CardContainer/FrontSide"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CardContainer/FrontSide/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="CardContainer/FrontSide/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 14
+text = "Card Title"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="LetterLabel" type="Label" parent="CardContainer/FrontSide/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "A"
+horizontal_alignment = 1
+
+[node name="ImageRect" type="TextureRect" parent="CardContainer/FrontSide/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DescriptionLabel" type="Label" parent="CardContainer/FrontSide/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Card description text goes here with details about this card."
+autowrap_mode = 3
+
+[node name="BackSide" type="Control" parent="CardContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="CardContainer/BackSide"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.156863, 0.466667, 0.862745, 1)
+
+[node name="Label" type="Label" parent="CardContainer/BackSide"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -41.5
+offset_top = -13.0
+offset_right = 41.5
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "PLAN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionIndicator" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ym8n3")

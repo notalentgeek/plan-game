@@ -1,0 +1,146 @@
+[gd_scene load_steps=5 format=3 uid="uid://dg3kjomfanrw0"]
+
+[ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_4wmrh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2clh6"]
+bg_color = Color(0.0588235, 0.364706, 0.670588, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6p1xf"]
+bg_color = Color(0.0392157, 0.243137, 0.447059, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5ohm"]
+bg_color = Color(0.0196078, 0.121569, 0.223529, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4wmrh")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.156863, 0.698039, 0.313726, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "PLAN"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Play Learn and Act Now"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SettingsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10
+
+[node name="PlayerCountContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/SettingsContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="PlayerCountLabel" type="Label" parent="MarginContainer/VBoxContainer/SettingsContainer/PlayerCountContainer"]
+layout_mode = 2
+text = "Number of Players:"
+
+[node name="PlayerCountSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/SettingsContainer/PlayerCountContainer"]
+layout_mode = 2
+min_value = 2.0
+max_value = 5.0
+value = 2.0
+alignment = 1
+update_on_text_changed = true
+
+[node name="Spacer2" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 15
+
+[node name="StartButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_2clh6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6p1xf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_g5ohm")
+text = "Start Game"
+
+[node name="RulesButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_2clh6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6p1xf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_g5ohm")
+text = "Rules"
+
+[node name="ExitButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_2clh6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6p1xf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_g5ohm")
+text = "Exit"
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -86.0
+offset_top = -26.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Version 1.0"
+horizontal_alignment = 2

@@ -13,8 +13,14 @@ Each problem has a letter code and severity index.
 var letter_code: String  # Alphabetical identifier (A-R)
 var severity_index: int  # Numerical severity (1-10)
 
-func _init(p_id: String = "", p_name: String = "", p_description: String = "",
-		p_texture_path: String = "", p_letter_code: String = "", p_severity_index: int = 1) -> void:
+func _init(
+		p_id: String = "",
+		p_name: String = "",
+		p_description: String = "",
+		p_texture_path: String = "",
+		p_letter_code: String = "",
+		p_severity_index: int = 1
+) -> void:
 	"""
 	Initialize a new problem card with the specified properties.
 
@@ -37,4 +43,9 @@ func _to_string() -> String:
 	Returns:
 		A string representation of the problem card
 	"""
-	return "[Problem Card: %s (%s) - Letter: %s, Index: %d]" % [card_name, id, letter_code, severity_index]
+	return "[Problem Card: %s (%s) - Letter: %s, Index: %d]" % [
+		card_name,
+		id,
+		letter_code,
+		severity_index
+	]

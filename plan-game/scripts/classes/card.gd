@@ -10,21 +10,26 @@ Provides common functionality and properties for all card types.
 
 # Card type enumeration
 enum CardType {
-	PROBLEM,   # Environmental problem cards
-	SOLUTION,  # Standard solution cards
-	ULTIMATE   # Ultimate solution cards that can solve any problem
+	PROBLEM, # Environmental problem cards
+	SOLUTION, # Standard solution cards
+	ULTIMATE # Ultimate solution cards that can solve any problem
 }
 
 # Card properties
-var id: String                 # Unique identifier for the card
-var card_name: String          # Display name of the card
-var description: String        # Card description text
-var card_type: int             # Type from CardType enum
-var texture_path: String       # Path to the card's texture
-var texture: Texture2D = null  # Loaded texture resource
+var id: String # Unique identifier for the card
+var card_name: String # Display name of the card
+var description: String # Card description text
+var card_type: int # Type from CardType enum
+var texture_path: String # Path to the card's texture
+var texture: Texture2D = null # Loaded texture resource
 
-func _init(p_id: String = "", p_name: String = "", p_description: String = "",
-		p_card_type: int = CardType.PROBLEM, p_texture_path: String = "") -> void:
+func _init(
+		p_id: String = "",
+		p_name: String = "",
+		p_description: String = "",
+		p_card_type: int = CardType.PROBLEM,
+		p_texture_path: String = ""
+) -> void:
 	"""
 	Initialize a new card with the specified properties.
 

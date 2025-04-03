@@ -13,8 +13,14 @@ Ultimate solution cards can solve any problem.
 var solvable_problems: Array[String] = [] # Problem letter codes this solution can solve
 var is_ultimate: bool = false # If true, can solve any problem
 
-func _init(p_id: String = "", p_name: String = "", p_description: String = "",
-		p_texture_path: String = "", p_solvable_problems: Array[String] = [], p_is_ultimate: bool = false) -> void:
+func _init(
+		p_id: String = "",
+		p_name: String = "",
+		p_description: String = "",
+		p_texture_path: String = "",
+		p_solvable_problems: Array[String] = [],
+		p_is_ultimate: bool = false
+) -> void:
 	"""
 	Initialize a new solution card with the specified properties.
 
@@ -46,7 +52,7 @@ func can_solve_problem(problem_letter: String) -> bool:
 func _to_string() -> String:
 	"""
 	Convert the solution card to a string representation for debugging.
-	
+
 	Returns:
 		A string representation of the solution card
 	"""
@@ -57,5 +63,10 @@ func _to_string() -> String:
 		if i < solvable_problems.size() - 1:
 			problems_str += ", "
 	problems_str += "]"
-	
-	return "[%s Card: %s (%s) - Solves: %s]" % [prefix, card_name, id, problems_str]
+
+	return "[%s Card: %s (%s) - Solves: %s]" % [
+		prefix,
+		card_name,
+		id,
+		problems_str
+	]

@@ -19,7 +19,7 @@ var max_cards: int = -1 # -1 means no limit
 var unique_cards: bool = false # Enforce unique cards in the deck
 
 func _init(
-		p_cards: Array[Card] = [],
+		p_cards = [], # Remove the type constraint
 		p_max_cards: int = -1,
 		p_unique_cards: bool = false
 ) -> void:
@@ -27,7 +27,7 @@ func _init(
 	Initialize the deck with optional parameters.
 
 	Args:
-		p_cards: Initial collection of cards
+		p_cards: Initial collection of cards (any Card subclass)
 		p_max_cards: Maximum number of cards allowed in the deck (-1 for unlimited)
 		p_unique_cards: Enforce unique cards in the deck
 	"""
@@ -36,7 +36,10 @@ func _init(
 
 	# Add initial cards with validation
 	for card in p_cards:
-		add_card(card)
+		if card is Card:
+			add_card(card)
+		else:
+			push_error("Non-Card object provided to Deck constructor")
 
 func add_card(card: Card) -> bool:
 	"""

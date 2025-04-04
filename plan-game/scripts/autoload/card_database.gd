@@ -15,7 +15,7 @@ var _solution_cards: Dictionary = {}
 
 # List of problem letter codes (A-R)
 const PROBLEM_CODES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
-                        "L", "M", "N", "O", "P", "Q", "R"]
+						"L", "M", "N", "O", "P", "Q", "R"]
 
 # Card initialization flags
 var _cards_initialized: bool = false

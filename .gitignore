@@ -1,100 +1,287 @@
-# Build Outputs
+# Build and Compilation Artifacts
+*.a
+*.aar
+*.apk
+*.aab
+*.bc
+*.dblite
+*.dll
+*.dylib
+*.exe
+*.exp
+*.ilk
+*.jar
+*.lib
+*.o
+*.obj
+*.os
+*.pdb
+*.pyc
+*.pyo
+*.so
+*.tsbuildinfo
+*.wasm
+.cache/
+.eslintcache
+.gradle/
+.nuxt/
 .out/
 .outs/
-build/
-dist/
-
-# Bundler Files
-.next/
-.nuxt/
 .parcel-cache/
 .pnp/
 .pnp.js
+.prettiercache
+.rollup.cache/
+.rpt2_cache/
 .snowpack/
+.stylelintcache
 .svelte-kit/
+.turbo/
+.webpack/
+bin/
+bin-debug/
+bin-release/
+build/
+dist/
+lib/
+out/
+public/build/
+public/dist/
+target/
 
-# Dependency Directories
+# Dependencies
+.npm/
+.pnpm-debug.log
+.yarn/
+bower_components/
+jspm_packages/
 node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
 
-# Environment And Secrets
+# Editor and IDE Files
+*.autosave
+*.bak
+*.code-workspace
+*.iml
+*.komodoproject
+*.launch
+*.orig
+*.save
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.sw?
+*.swap
+*.tmp
+*.user
+*~
+.atom/
+.classpath
+.directory
+.editor_config
+.history/
+.idea/
+.intellij/
+.komodotools/
+.project
+.settings/
+.vs/
+.vscode/
+nbproject/
+TAGS
+tags
+
+# Environment and Secrets
+*.env
+*.pem
+.credentials/
 .env
+.env.*
 .env.*.local
+.envrc
+.npmrc
+.yarnrc
+config.local.js
+credentials.json
+env.js
+secrets.json
+tokens.json
 
-# Game Assets (Exclude unoptimized and large assets)
+# Game Assets
+*.3ds
+*.ai
+*.afdesign
+*.afphoto
+*.aseprite
+*.asset
 *.blend
+*.blend1
+*.clip
+*.cubemap
+*.dds
 *.exr
 *.fbx
+*.figma
 *.flac
+*.fla
+*.fnt
 *.gltf
 *.glb
+*.hdr
 *.ico
 *.kra
+*.ma
+*.material
+*.max
+*.mid
+*.midi
 *.mp3
 *.mp4
 *.mov
+*.mdl
+*.mtl
 *.obj
 *.ogg
+*.ogv
+*.otf
+*.pio
+*.png.import
 *.psd
+*.resources
+*.sai
+*.spp
+*.svg.import
 *.tga
 *.tif
 *.tiff
-*.tmp
 *.translation
+*.ttf
+*.uasset
+*.umap
+*.unitypackage
 *.wav
 *.webm
+*.webp
 *.xcf
+**/assets/
+Resources/
+Textures/
+raw_assets/
 
-# Godot Specific Files
+# Godot Specific
+*.dialogue.import
+*.gdshader.import
+*.gd.remap
+*.import
+*.res.remap
+*.scn
+*.shader.import
+*.stex
+*.uid
+*.tres.remap
+*.tscn.remap
 .android/
-.editor_config
 .export/
 .godot/
 .import/
 .mono/
+addons/
+export.cfg
+export_presets.cfg
+godot.svg
+icon.png
+icon.svg
+override.cfg
+projects.godot
 
-# IDE And Editor Files
-*.code-workspace
-.idea/
-.project
-.settings/
-.vscode/
-
-# Logs
+# Logs and Debug Files
+*.dump
 *.log
+*.profraw
+*.stackdump
+.coverage
+.coverage.*
+.jest/
+.lighthouse/
+.nyc_output/
+.pnpm-debug.log
+callgrind.*
+chrome-profiler-events*.json
+chrome-profiler-events.json
+coverage/
+electron-builder-log*.yaml
+flamegraph.*
+flame-*.json
+*.heapprofile
+*.heapsnapshot
+htmlcov/
 logs/
+mono_crash.*
 npm-debug.log*
+perf-*.{map,data}
+perf.*
+profile-*.json
+speed-measure-plugin*.json
+trace-*.json
+trace.json
 yarn-debug.log*
 yarn-error.log*
 
-# Other
-**/assets/
-.cache/
-.eslintcache
-.prettiercache
-.stylelintcache
+# Next.js Specific
+.next/
+.vercel/
+next-env.d.ts
+public/sw.js
+public/workbox-*.js
 
-# Package Manager Files
-.pnpm-debug.log
-package-lock.json
-yarn.lock
-
-# PhaserJS Specific Files
-public/build/
-public/dist/
+# Project Specific
+.backups/
+debug/
+playtests/
+prototypes/
+scene_hierarchy.txt
+snapshots/
+user_preferences.cfg
+WIP/
 
 # System Files
+$RECYCLE.BIN/
+._*
+.AppleDB
+.AppleDesktop
+.AppleDouble
+.apdisk
 .DS_Store
+.DocumentRevisions-V100/
+.fseventsd/
+.LSOverride
+.Spotlight-V100/
+.TemporaryItems/
+.Trash-*
+.Trashes/
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.directory
+.fuse_hidden*
+.nfs*
+Icon?
+Network Trash Folder/
+Temporary Items/
 Thumbs.db
+Thumbs.db:encryptable
+desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
 
 # Temporary Files
+*.bak.*
+*.orig.*
+*.patch
+*.rej
 *.swp
 *.temp
 *.tmp
-
-# Testing
-.jest/
-.nyc_output/
-coverage/
-
-# TypeScript
-*.tsbuildinfo
+.~lock.*
+\#*#

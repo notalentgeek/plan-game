@@ -56,10 +56,13 @@ func _on_card_clicked(card: Card) -> void:
 	"""
 	print("Card clicked: ", card.card_name)
 
-	# We can access the card visual through the signal's source
-	var card_visual = get_signal_source() as CardVisual
-	if card_visual:
-		card_visual.toggle_flip()
+	# Find the card visual in our children
+	for child in get_children():
+		if child is CenterContainer:
+			for container_child in child.get_children():
+				if container_child is CardVisual:
+					container_child.toggle_flip()
+					break
 
 func _on_card_hover_started(card: Card) -> void:
 	"""

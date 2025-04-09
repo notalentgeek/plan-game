@@ -395,7 +395,9 @@ func _on_gui_input(event: InputEvent) -> void:
 	"""
 	if current_state != VisualState.DISABLED:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			print("Card visual clicked: ", card.card_name if card else "Unknown")
 			emit_signal("card_clicked", card)
+			toggle_flip() # Automatically toggle flip on click
 
 func _on_mouse_entered() -> void:
 	"""

@@ -75,11 +75,21 @@ func _create_card_structure() -> void:
 	"""
 	Create the visual structure of the card.
 	"""
+	# Create a container to enforce consistent size
+	var card_container = Control.new()
+	card_container.name = "CardContainer"
+	card_container.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
+	card_container.size = Vector2(CARD_WIDTH, CARD_HEIGHT)
+	card_container.mouse_filter = Control.MOUSE_FILTER_PASS # Pass input events to parent
+	add_child(card_container)
+
 	# Create front of card
 	card_front = PanelContainer.new()
 	card_front.name = "CardFront"
+	card_front.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_front.size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_front.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_front.clip_contents = true # Prevent content from expanding panel
 
 	# Set up front panel style
 	var front_style = StyleBoxFlat.new()
@@ -91,7 +101,7 @@ func _create_card_structure() -> void:
 	front_style.shadow_size = 2
 	front_style.shadow_offset = Vector2(1, 1)
 	card_front.add_theme_stylebox_override("panel", front_style)
-	add_child(card_front)
+	card_container.add_child(card_front)
 
 	# Add content container to the front
 	var front_margin = MarginContainer.new()
@@ -114,6 +124,8 @@ func _create_card_structure() -> void:
 	card_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card_name_label.add_theme_font_size_override("font_size", 16)
 	card_name_label.add_theme_color_override("font_color", Color.WHITE)
+	card_name_label.clip_text = true # Truncate text if too long
+	card_name_label.max_lines_visible = 1 # Only show one line
 	content_container.add_child(card_name_label)
 
 	# Card icon/image
@@ -121,8 +133,7 @@ func _create_card_structure() -> void:
 	card_icon.name = "CardIcon"
 	card_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	card_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	card_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	card_icon.custom_minimum_size = Vector2(0, 80)
+	card_icon.custom_minimum_size = Vector2(0, 60) # Reduce height slightly
 	card_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	content_container.add_child(card_icon)
 
@@ -135,6 +146,8 @@ func _create_card_structure() -> void:
 	card_description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	card_description_label.add_theme_color_override("font_color", Color.WHITE)
 	card_description_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_description_label.max_lines_visible = 6 # Limit to 6 lines max
+	card_description_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS # Add ... if truncated
 	content_container.add_child(card_description_label)
 
 	# Card details (letter code, severity, solvable problems)
@@ -144,11 +157,14 @@ func _create_card_structure() -> void:
 	card_details_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card_details_label.add_theme_font_size_override("font_size", 12)
 	card_details_label.add_theme_color_override("font_color", Color.WHITE)
+	card_details_label.clip_text = true # Truncate text if too long
+	card_details_label.max_lines_visible = 1 # Only show one line
 	content_container.add_child(card_details_label)
 
-	# Create back of card
+	# Create back of card with IDENTICAL sizing
 	card_back = PanelContainer.new()
 	card_back.name = "CardBack"
+	card_back.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_back.size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -162,7 +178,7 @@ func _create_card_structure() -> void:
 	back_style.shadow_size = 2
 	back_style.shadow_offset = Vector2(1, 1)
 	card_back.add_theme_stylebox_override("panel", back_style)
-	add_child(card_back)
+	card_container.add_child(card_back)
 
 	# Add PLAN logo to the back
 	var back_margin = MarginContainer.new()
@@ -205,13 +221,13 @@ func _create_animations() -> void:
 
 	# Track for front visibility
 	var front_track = flip_to_front_anim.add_track(Animation.TYPE_VALUE)
-	flip_to_front_anim.track_set_path(front_track, "CardFront:visible")
+	flip_to_front_anim.track_set_path(front_track, "CardContainer/CardFront:visible")
 	flip_to_front_anim.track_insert_key(front_track, 0.0, false)
 	flip_to_front_anim.track_insert_key(front_track, 0.15, true)
 
 	# Track for back visibility
 	var back_track = flip_to_front_anim.add_track(Animation.TYPE_VALUE)
-	flip_to_front_anim.track_set_path(back_track, "CardBack:visible")
+	flip_to_front_anim.track_set_path(back_track, "CardContainer/CardBack:visible")
 	flip_to_front_anim.track_insert_key(back_track, 0.0, true)
 	flip_to_front_anim.track_insert_key(back_track, 0.15, false)
 
@@ -230,13 +246,13 @@ func _create_animations() -> void:
 
 	# Track for front visibility
 	front_track = flip_to_back_anim.add_track(Animation.TYPE_VALUE)
-	flip_to_back_anim.track_set_path(front_track, "CardFront:visible")
+	flip_to_back_anim.track_set_path(front_track, "CardContainer/CardFront:visible")
 	flip_to_back_anim.track_insert_key(front_track, 0.0, true)
 	flip_to_back_anim.track_insert_key(front_track, 0.15, false)
 
 	# Track for back visibility
 	back_track = flip_to_back_anim.add_track(Animation.TYPE_VALUE)
-	flip_to_back_anim.track_set_path(back_track, "CardBack:visible")
+	flip_to_back_anim.track_set_path(back_track, "CardContainer/CardBack:visible")
 	flip_to_back_anim.track_insert_key(back_track, 0.0, false)
 	flip_to_back_anim.track_insert_key(back_track, 0.15, true)
 

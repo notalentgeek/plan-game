@@ -208,53 +208,39 @@ func _create_animations() -> void:
 	# Create animation library
 	var library = AnimationLibrary.new()
 
-	# Create flip to front animation
+	# Create a simple flip to front animation - just visibility toggle
 	var flip_to_front_anim = Animation.new()
-	flip_to_front_anim.length = 0.3
-
-	# Track for scaling (to simulate perspective)
-	var scale_track = flip_to_front_anim.add_track(Animation.TYPE_VALUE)
-	flip_to_front_anim.track_set_path(scale_track, ":scale")
-	flip_to_front_anim.track_insert_key(scale_track, 0.0, Vector2(1.0, 1.0))
-	flip_to_front_anim.track_insert_key(scale_track, 0.15, Vector2(0.1, 1.0))
-	flip_to_front_anim.track_insert_key(scale_track, 0.3, Vector2(1.0, 1.0))
+	flip_to_front_anim.length = 0.1  # Very short, just a quick transition
 
 	# Track for front visibility
 	var front_track = flip_to_front_anim.add_track(Animation.TYPE_VALUE)
 	flip_to_front_anim.track_set_path(front_track, "CardContainer/CardFront:visible")
 	flip_to_front_anim.track_insert_key(front_track, 0.0, false)
-	flip_to_front_anim.track_insert_key(front_track, 0.15, true)
+	flip_to_front_anim.track_insert_key(front_track, 0.1, true)
 
 	# Track for back visibility
 	var back_track = flip_to_front_anim.add_track(Animation.TYPE_VALUE)
 	flip_to_front_anim.track_set_path(back_track, "CardContainer/CardBack:visible")
 	flip_to_front_anim.track_insert_key(back_track, 0.0, true)
-	flip_to_front_anim.track_insert_key(back_track, 0.15, false)
+	flip_to_front_anim.track_insert_key(back_track, 0.1, false)
 
 	library.add_animation("flip_to_front", flip_to_front_anim)
 
-	# Create flip to back animation
+	# Create a simple flip to back animation - just visibility toggle
 	var flip_to_back_anim = Animation.new()
-	flip_to_back_anim.length = 0.3
-
-	# Track for scaling
-	scale_track = flip_to_back_anim.add_track(Animation.TYPE_VALUE)
-	flip_to_back_anim.track_set_path(scale_track, ":scale")
-	flip_to_back_anim.track_insert_key(scale_track, 0.0, Vector2(1.0, 1.0))
-	flip_to_back_anim.track_insert_key(scale_track, 0.15, Vector2(0.1, 1.0))
-	flip_to_back_anim.track_insert_key(scale_track, 0.3, Vector2(1.0, 1.0))
+	flip_to_back_anim.length = 0.1
 
 	# Track for front visibility
 	front_track = flip_to_back_anim.add_track(Animation.TYPE_VALUE)
 	flip_to_back_anim.track_set_path(front_track, "CardContainer/CardFront:visible")
 	flip_to_back_anim.track_insert_key(front_track, 0.0, true)
-	flip_to_back_anim.track_insert_key(front_track, 0.15, false)
+	flip_to_back_anim.track_insert_key(front_track, 0.1, false)
 
 	# Track for back visibility
 	back_track = flip_to_back_anim.add_track(Animation.TYPE_VALUE)
 	flip_to_back_anim.track_set_path(back_track, "CardContainer/CardBack:visible")
 	flip_to_back_anim.track_insert_key(back_track, 0.0, false)
-	flip_to_back_anim.track_insert_key(back_track, 0.15, true)
+	flip_to_back_anim.track_insert_key(back_track, 0.1, true)
 
 	library.add_animation("flip_to_back", flip_to_back_anim)
 
@@ -262,7 +248,7 @@ func _create_animations() -> void:
 	var hover = Animation.new()
 	hover.length = 0.2
 
-	scale_track = hover.add_track(Animation.TYPE_VALUE)
+	var scale_track = hover.add_track(Animation.TYPE_VALUE)
 	hover.track_set_path(scale_track, ":scale")
 	hover.track_insert_key(scale_track, 0.0, Vector2(1.0, 1.0))
 	hover.track_insert_key(scale_track, 0.2, Vector2(1.05, 1.05))

@@ -45,6 +45,7 @@ var animation_player: AnimationPlayer
 var card: Card = null
 var current_state: int = VisualState.DEFAULT
 var flipped: bool = true # true = back showing, false = front showing
+var is_animating: bool = false
 
 func _ready() -> void:
 	"""
@@ -67,6 +68,8 @@ func _ready() -> void:
 	# Default to showing the back
 	card_front.visible = false
 	card_back.visible = true
+
+	animation_player.animation_finished.connect(Callable(self, "_on_animation_finished"))
 
 func _create_card_structure() -> void:
 	"""
@@ -365,17 +368,19 @@ func flip_to_front() -> void:
 	"""
 	Flip the card to show its front side.
 	"""
-	if flipped:
+	if flipped and not is_animating:
+		is_animating = true
 		animation_player.play("flip_to_front")
-		flipped = false
+		# We'll update flipped in the animation finished callback
 
 func flip_to_back() -> void:
 	"""
 	Flip the card to show its back side.
 	"""
-	if not flipped:
+	if not flipped and not is_animating:
+		is_animating = true
 		animation_player.play("flip_to_back")
-		flipped = true
+		# We'll update flipped in the animation finished callback
 
 func toggle_flip() -> void:
 	"""
@@ -385,6 +390,20 @@ func toggle_flip() -> void:
 		flip_to_front()
 	else:
 		flip_to_back()
+
+func _on_animation_finished(anim_name: String) -> void:
+	"""
+	Handle animation completion events.
+
+	Args:
+		anim_name: The name of the animation that finished
+	"""
+	is_animating = false
+
+	if anim_name == "flip_to_front":
+		flipped = false
+	elif anim_name == "flip_to_back":
+		flipped = true
 
 func _on_gui_input(event: InputEvent) -> void:
 	"""

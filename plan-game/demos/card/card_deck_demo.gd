@@ -34,24 +34,45 @@ func _ready() -> void:
 	var card_db = get_node_or_null("/root/CardDatabase")
 	if card_db == null:
 		print("CardDatabase singleton not found, attempting to create it")
-		var card_db_script = load("res://scripts/autoload/card_database.gd")
-		if card_db_script:
-			card_db = card_db_script.new()
-			card_db.name = "CardDatabase"
-			get_tree().root.add_child(card_db)
-			print("Added CardDatabase singleton dynamically")
-			# Wait for card database to initialize
+
+		# Check if CardDatabase is already registered as an autoload
+		if Engine.has_singleton("CardDatabase"):
+			print("CardDatabase registered as singleton but not found in tree")
+			# This shouldn't happen normally, but just in case
 			await get_tree().process_frame
-			# Verify it was added successfully
 			card_db = get_node_or_null("/root/CardDatabase")
-			if card_db:
-				print("CardDatabase singleton successfully created")
+		else:
+			# If not an autoload, we need to create it manually
+			var card_db_script = load("res://scripts/autoload/card_database.gd")
+			if card_db_script:
+				card_db = card_db_script.new()
+				card_db.name = "CardDatabase"
+				# Use call_deferred to avoid "parent node is busy" error
+				get_tree().root.call_deferred("add_child", card_db)
+				print("CardDatabase singleton created manually")
+
+				# Make sure cards are initialized
+				if card_db.has_method("initialize_cards"):
+					card_db.initialize_cards()
+					print("CardDatabase cards initialized")
 			else:
 				push_error("Failed to create CardDatabase singleton")
-		else:
-			push_error("Failed to load CardDatabase script")
 	else:
 		print("CardDatabase singleton found")
+
+	# Make sure card database cards are initialized
+	if card_db and card_db.has_method("initialize_cards"):
+		if not card_db._cards_initialized:
+			# We need to wait until CardDatabase is properly initialized
+			# if we added it with call_deferred
+			await get_tree().process_frame
+
+			# Get the reference again in case it changed
+			card_db = get_node_or_null("/root/CardDatabase")
+			if card_db and card_db.has_method("initialize_cards"):
+				if not card_db._cards_initialized:
+					card_db.initialize_cards()
+					print("CardDatabase cards initialized")
 
 	_setup_ui()
 	_connect_signals()

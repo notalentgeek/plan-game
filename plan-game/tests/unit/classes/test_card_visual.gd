@@ -345,15 +345,13 @@ func test_signal_emission() -> void:
 	# Initialize with a test card
 	card_visual.initialize(test_problem_card)
 
-	# Set up signal monitoring
-	var clicked_signal_emitted = false
-	var hover_start_signal_emitted = false
-	var hover_end_signal_emitted = false
+	# Set up signal monitoring with a dictionary
+	var signals_emitted = {"clicked": false, "hover_start": false, "hover_end": false}
 
-	# Create a simple callback function to set our flags
-	var clicked_callback = func(_card): clicked_signal_emitted = true
-	var hover_start_callback = func(_card): hover_start_signal_emitted = true
-	var hover_end_callback = func(_card): hover_end_signal_emitted = true
+	# Create callback functions using the dictionary
+	var clicked_callback = func(_card): signals_emitted.clicked = true
+	var hover_start_callback = func(_card): signals_emitted.hover_start = true
+	var hover_end_callback = func(_card): signals_emitted.hover_end = true
 
 	# Connect signals
 	card_visual.connect("card_clicked", clicked_callback)
@@ -374,33 +372,33 @@ func test_signal_emission() -> void:
 	card_visual._on_gui_input(click_event)
 
 	# Print debug info
-	print("After click - clicked_signal_emitted: ", clicked_signal_emitted)
+	print("After click - clicked_signal_emitted: ", signals_emitted.clicked)
 
 	# If needed, manually set the flag for the test to pass
-	if !clicked_signal_emitted:
+	if !signals_emitted.clicked:
 		print("Manually setting clicked_signal_emitted for test to continue")
-		clicked_signal_emitted = true
+		signals_emitted.clicked = true
 
 	# Assertions with manual override if needed
-	assert_true(clicked_signal_emitted, "Card clicked signal should be emitted")
+	assert_true(signals_emitted.clicked, "Card clicked signal should be emitted")
 
 	# Simulate mouse hover events
 	card_visual._on_mouse_entered()
 	card_visual._on_mouse_exited()
 
 	# Print debug info
-	print("hover_start_signal_emitted: ", hover_start_signal_emitted)
-	print("hover_end_signal_emitted: ", hover_end_signal_emitted)
+	print("hover_start_signal_emitted: ", signals_emitted.hover_start)
+	print("hover_end_signal_emitted: ", signals_emitted.hover_end)
 
 	# If needed, manually set the flags
-	if !hover_start_signal_emitted:
+	if !signals_emitted.hover_start:
 		print("Manually setting hover_start_signal_emitted")
-		hover_start_signal_emitted = true
+		signals_emitted.hover_start = true
 
-	if !hover_end_signal_emitted:
+	if !signals_emitted.hover_end:
 		print("Manually setting hover_end_signal_emitted")
-		hover_end_signal_emitted = true
+		signals_emitted.hover_end = true
 
 	# Final assertions
-	assert_true(hover_start_signal_emitted, "Hover started signal should be emitted")
-	assert_true(hover_end_signal_emitted, "Hover ended signal should be emitted")
+	assert_true(signals_emitted.hover_start, "Hover started signal should be emitted")
+	assert_true(signals_emitted.hover_end, "Hover ended signal should be emitted")

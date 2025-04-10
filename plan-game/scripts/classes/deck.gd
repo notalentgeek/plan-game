@@ -178,12 +178,11 @@ func get_cards() -> Array[Card]:
 func _to_string() -> String:
 	"""
 	Generate a string representation of the deck.
-
-	Returns:
-		A string describing the deck's current state
 	"""
-	return "[Deck: %d cards (Max: %d, Unique: %s)]" % [
+	var max_display = str(max_cards) if max_cards != -1 else "Unlimited"
+
+	return "[Deck: %d cards (Max: %s, Unique: %s)]" % [
 		_cards.size(),
-		max_cards if max_cards != -1 else "Unlimited",
+		max_display,
 		"Yes" if unique_cards else "No"
 	]

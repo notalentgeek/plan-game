@@ -184,6 +184,6 @@ func _to_string() -> String:
 	"""
 	return "[Deck: %d cards (Max: %d, Unique: %s)]" % [
 		_cards.size(),
-		max_cards if max_cards != -1 else "Unlimited",
+		str(max_cards) if max_cards != -1 else "Unlimited",
 		"Yes" if unique_cards else "No"
 	]

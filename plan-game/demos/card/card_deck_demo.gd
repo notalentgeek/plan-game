@@ -145,7 +145,16 @@ func _setup_ui() -> void:
 	card_display_area.add_theme_constant_override("h_separation", CARD_SPACING)
 	card_display_area.add_theme_constant_override("v_separation", CARD_SPACING)
 	card_display_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll_container.add_child(card_display_area)
+
+	# Add margins around the card display area to prevent clipping
+	var display_margin = MarginContainer.new()
+	display_margin.add_theme_constant_override("margin_left", 20)
+	display_margin.add_theme_constant_override("margin_right", 20)
+	display_margin.add_theme_constant_override("margin_top", 20)
+	display_margin.add_theme_constant_override("margin_bottom", 20)
+	display_margin.add_child(card_display_area)
+
+	scroll_container.add_child(display_margin)
 
 	# Card Information Panel
 	card_info_panel = PanelContainer.new()
@@ -535,15 +544,21 @@ func _add_card_to_display(card: Card) -> void:
 	Create a visual representation of a card and add it to the display area.
 	"""
 	var card_visual = CardVisual.new()
+
+	# Add the card visual to the display first
+	card_display_area.add_child(card_visual)
+
+	# Initialize after adding to the scene to ensure proper setup
 	card_visual.initialize(card)
-	card_visual.flip_to_front() # Show the front by default
 
 	# Connect card signals
 	card_visual.card_clicked.connect(Callable(self, "_on_card_clicked"))
 	card_visual.card_hover_started.connect(Callable(self, "_on_card_hover_started"))
 	card_visual.card_hover_ended.connect(Callable(self, "_on_card_hover_ended"))
 
-	card_display_area.add_child(card_visual)
+	# Ensure cards always show front by default in this demo
+	# Wait a frame to make sure the card is fully initialized
+	call_deferred("_ensure_card_front_showing", card_visual)
 
 func _update_deck_info() -> void:
 	"""
@@ -618,6 +633,10 @@ func _on_card_clicked(card: Card) -> void:
 					if other_child is CardVisual and other_child != child:
 						other_child.set_visual_state(CardVisual.VisualState.DEFAULT)
 				child.set_visual_state(CardVisual.VisualState.SELECTED)
+
+			# Toggle the card flip
+			print("Toggling card flip")
+			child.toggle_flip()
 			break
 
 func _on_card_hover_started(card: Card) -> void:

@@ -15,6 +15,9 @@ var card_info_type: Label
 var card_info_description: Label
 var card_info_details: Label
 
+var is_dragging = false
+var drag_started = false
+
 # Card display constants
 const CARD_SPACING = 10
 const MAX_CARDS_PER_ROW = 4
@@ -613,9 +616,11 @@ func _update_card_info(card: Card) -> void:
 # ----- Card Interaction Handlers -----
 func _on_card_clicked(card: Card) -> void:
 	"""
-	Handle card click events.
+	Handle card click events from CardVisual signals.
+	This will be called when the CardVisual emits a click event,
+	but we'll handle the actual flip in the _input function now.
 	"""
-	print("Card clicked: ", card.card_name)
+	print("Card clicked signal: ", card.card_name)
 
 	# Update card info panel
 	_update_card_info(card)
@@ -634,9 +639,7 @@ func _on_card_clicked(card: Card) -> void:
 						other_child.set_visual_state(CardVisual.VisualState.DEFAULT)
 				child.set_visual_state(CardVisual.VisualState.SELECTED)
 
-			# Toggle the card flip
-			print("Toggling card flip")
-			child.toggle_flip()
+			# We'll handle flip in _input to avoid interrupting drags
 			break
 
 func _on_card_hover_started(card: Card) -> void:
@@ -655,9 +658,36 @@ func _process(_delta: float) -> void:
 	"""
 	Process function used for card dragging.
 	"""
-	if selected_card_visual and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	if selected_card_visual and is_dragging:
 		var mouse_pos = get_global_mouse_position()
-		selected_card_visual.global_position = mouse_pos - drag_start_position
+
+		# Only actually move the card if we've moved a bit, to differentiate
+		# between a click and a drag
+		if not drag_started:
+			# Require moving at least 5 pixels to start dragging
+			if (mouse_pos - (selected_card_visual.global_position + drag_start_position)).length() > 5:
+				drag_started = true
+				print("Drag started")
+
+		# Only move the card if dragging has started
+		if drag_started:
+			selected_card_visual.global_position = mouse_pos - drag_start_position
+
+			# Keep card within the bounds of the card display area
+			var card_display_rect = Rect2(
+				card_display_area.global_position,
+				card_display_area.size
+			)
+			selected_card_visual.global_position.x = clamp(
+				selected_card_visual.global_position.x,
+				card_display_rect.position.x,
+				card_display_rect.position.x + card_display_rect.size.x - selected_card_visual.size.x
+			)
+			selected_card_visual.global_position.y = clamp(
+				selected_card_visual.global_position.y,
+				card_display_rect.position.y,
+				card_display_rect.position.y + card_display_rect.size.y - selected_card_visual.size.y
+			)
 
 func _input(event: InputEvent) -> void:
 	"""
@@ -666,28 +696,72 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				# Potential drag start - check if we clicked on a card
+				# Start dragging if clicked on a card
 				_try_select_card_at_position(event.global_position)
+				is_dragging = true
+				drag_started = false # We haven't started truly dragging until mouse moves
+				print("Mouse pressed, checking for card selection")
 			else:
-				# Drag end
-				if selected_card_visual:
-					# Return card to grid or handle drop logic here
-					selected_card_visual = null
+				# End dragging
+				print("Mouse released, drag ended")
+
+				# If we never actually dragged the card, treat it as a click
+				if selected_card_visual and not drag_started:
+					# This was a click, not a drag - toggle the card
+					selected_card_visual.toggle_flip()
+					print("Card clicked (not dragged) - flipping")
+
+				# Reset drag state
+				is_dragging = false
+				drag_started = false
 
 func _try_select_card_at_position(global_pos: Vector2) -> void:
 	"""
 	Attempt to select a card at the given position.
 	"""
+	# First, check if we're clicking on a card
 	for child in card_display_area.get_children():
 		if child is CardVisual:
-			var card_global_pos = child.global_position
-			var card_size = child.size
-			var card_rect = Rect2(card_global_pos, card_size)
+			# Get the card's global rect
+			var card_global_rect = Rect2(
+				child.global_position,
+				child.size
+			)
 
-			if card_rect.has_point(global_pos):
-				selected_card_visual = child
-				# Calculate offset so card doesn't jump to cursor center
-				drag_start_position = global_pos - card_global_pos
-				# Bring selected card to front by moving it to the end of the children list
+			# Check if the click is within the card's boundaries
+			if card_global_rect.has_point(global_pos):
+				# Select this card for dragging
+				if selected_card_visual != child:
+					# Deselect previous card if any
+					if selected_card_visual:
+						selected_card_visual.set_visual_state(CardVisual.VisualState.DEFAULT)
+
+					# Select new card
+					selected_card_visual = child
+					selected_card_visual.set_visual_state(CardVisual.VisualState.SELECTED)
+
+					# Update card info
+					_update_card_info(child.card)
+
+				# Set up dragging
+				drag_start_position = global_pos - child.global_position
+
+				# Bring selected card to front
 				card_display_area.move_child(child, card_display_area.get_child_count() - 1)
+
+				# Debugging output
+				print("Selected card for dragging: ", child.card.card_name)
 				return
+
+	# If we reach here, no card was clicked
+	if selected_card_visual:
+		selected_card_visual.set_visual_state(CardVisual.VisualState.DEFAULT)
+		selected_card_visual = null
+		_update_card_info(null)
+
+func _ensure_card_front_showing(card_visual: CardVisual) -> void:
+	"""
+	Make sure the card is showing its front face.
+	"""
+	if card_visual and card_visual.flipped:
+		card_visual.flip_to_front()

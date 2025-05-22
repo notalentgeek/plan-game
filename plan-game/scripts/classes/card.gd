@@ -59,8 +59,15 @@ func get_texture() -> Texture2D:
 		The card's texture, or null if not available
 	"""
 	if texture == null and !texture_path.is_empty():
+		print("Loading texture from path: ", texture_path)
 		if ResourceLoader.exists(texture_path):
 			texture = load(texture_path)
+			if texture:
+				print("Successfully loaded texture")
+			else:
+				print("Failed to load texture despite file existing")
+		else:
+			print("Texture file does not exist at path: ", texture_path)
 	return texture
 
 func _to_string() -> String:

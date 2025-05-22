@@ -80,7 +80,7 @@ func _create_card_structure() -> void:
 	card_container.name = "CardContainer"
 	card_container.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_container.size = Vector2(CARD_WIDTH, CARD_HEIGHT)
-	card_container.mouse_filter = Control.MOUSE_FILTER_PASS # Pass input events to parent
+	card_container.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(card_container)
 
 	# Create front of card
@@ -89,86 +89,45 @@ func _create_card_structure() -> void:
 	card_front.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_front.size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_front.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card_front.clip_contents = true # Prevent content from expanding panel
+	card_front.clip_contents = true
 
-	# Set up front panel style
+	# Set up front panel style - make it transparent
 	var front_style = StyleBoxFlat.new()
-	front_style.bg_color = SOLUTION_CARD_COLOR
+	front_style.bg_color = Color.TRANSPARENT
 	front_style.corner_radius_top_left = CARD_CORNER_RADIUS
 	front_style.corner_radius_top_right = CARD_CORNER_RADIUS
 	front_style.corner_radius_bottom_left = CARD_CORNER_RADIUS
 	front_style.corner_radius_bottom_right = CARD_CORNER_RADIUS
-	front_style.shadow_size = 2
-	front_style.shadow_offset = Vector2(1, 1)
 	card_front.add_theme_stylebox_override("panel", front_style)
 	card_container.add_child(card_front)
 
-	# Add content container to the front
-	var front_margin = MarginContainer.new()
-	front_margin.add_theme_constant_override("margin_left", 10)
-	front_margin.add_theme_constant_override("margin_right", 10)
-	front_margin.add_theme_constant_override("margin_top", 10)
-	front_margin.add_theme_constant_override("margin_bottom", 10)
-	card_front.add_child(front_margin)
-
-	# Create vertical layout for card content
-	var content_container = VBoxContainer.new()
-	content_container.size_flags_vertical = Control.SIZE_FILL
-	content_container.size_flags_horizontal = Control.SIZE_FILL
-	front_margin.add_child(content_container)
-
-	# Card name at the top
-	card_name_label = Label.new()
-	card_name_label.name = "CardName"
-	card_name_label.text = "Card Name"
-	card_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card_name_label.add_theme_font_size_override("font_size", 16)
-	card_name_label.add_theme_color_override("font_color", Color.WHITE)
-	card_name_label.clip_text = true # Truncate text if too long
-	card_name_label.max_lines_visible = 1 # Only show one line
-	content_container.add_child(card_name_label)
-
-	# Card icon/image
+	# Just add the card icon directly to the front panel - no extra containers
 	card_icon = TextureRect.new()
 	card_icon.name = "CardIcon"
-	card_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	card_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	card_icon.custom_minimum_size = Vector2(0, 60) # Reduce height slightly
-	card_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	content_container.add_child(card_icon)
+	card_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	card_icon.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_icon.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_front.add_child(card_icon)
 
-	# Card description
+	# We still create the text labels but don't add them to the scene immediately
+	# They'll be added later if needed
+	card_name_label = Label.new()
+	card_name_label.name = "CardName"
+
 	card_description_label = Label.new()
 	card_description_label.name = "CardDescription"
-	card_description_label.text = "Card description text"
-	card_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	card_description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card_description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	card_description_label.add_theme_color_override("font_color", Color.WHITE)
-	card_description_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	card_description_label.max_lines_visible = 6 # Limit to 6 lines max
-	card_description_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS # Add ... if truncated
-	content_container.add_child(card_description_label)
 
-	# Card details (letter code, severity, solvable problems)
 	card_details_label = Label.new()
 	card_details_label.name = "CardDetails"
-	card_details_label.text = "Details"
-	card_details_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card_details_label.add_theme_font_size_override("font_size", 12)
-	card_details_label.add_theme_color_override("font_color", Color.WHITE)
-	card_details_label.clip_text = true # Truncate text if too long
-	card_details_label.max_lines_visible = 1 # Only show one line
-	content_container.add_child(card_details_label)
 
-	# Create back of card with IDENTICAL sizing
+	# Create back of card (keep this unchanged)
 	card_back = PanelContainer.new()
 	card_back.name = "CardBack"
 	card_back.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_back.size = Vector2(CARD_WIDTH, CARD_HEIGHT)
 	card_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# Set up back panel style
 	var back_style = StyleBoxFlat.new()
 	back_style.bg_color = CARD_BACK_COLOR
 	back_style.corner_radius_top_left = CARD_CORNER_RADIUS
@@ -180,7 +139,6 @@ func _create_card_structure() -> void:
 	card_back.add_theme_stylebox_override("panel", back_style)
 	card_container.add_child(card_back)
 
-	# Add PLAN logo to the back
 	var back_margin = MarginContainer.new()
 	back_margin.add_theme_constant_override("margin_left", 20)
 	back_margin.add_theme_constant_override("margin_right", 20)
@@ -196,7 +154,6 @@ func _create_card_structure() -> void:
 	back_label.add_theme_color_override("font_color", Color.WHITE)
 	back_margin.add_child(back_label)
 
-	# Create animation player
 	animation_player = AnimationPlayer.new()
 	animation_player.name = "AnimationPlayer"
 	add_child(animation_player)
@@ -210,7 +167,7 @@ func _create_animations() -> void:
 
 	# Create a simple flip to front animation - just visibility toggle
 	var flip_to_front_anim = Animation.new()
-	flip_to_front_anim.length = 0.1  # Very short, just a quick transition
+	flip_to_front_anim.length = 0.1 # Very short, just a quick transition
 
 	# Track for front visibility
 	var front_track = flip_to_front_anim.add_track(Animation.TYPE_VALUE)
@@ -272,9 +229,6 @@ func _create_animations() -> void:
 func initialize(p_card: Card) -> void:
 	"""
 	Initialize the card visual with data from the provided card.
-
-	Args:
-		p_card: The card data to visualize
 	"""
 	card = p_card
 	if card == null:
@@ -286,16 +240,33 @@ func initialize(p_card: Card) -> void:
 		_create_card_structure()
 		_create_animations()
 
-	# Update visual elements with card data
-	card_name_label.text = card.card_name
-	card_description_label.text = card.description
-
-	# Set card texture if available
+	# Get the texture
 	var texture = card.get_texture()
-	if texture:
-		card_icon.texture = texture
+	print("Initialize - card name: ", card.card_name)
+	print("Initialize - texture: ", texture)
+	print("Initialize - texture path: ", card.texture_path)
 
-	# Configure based on card type
+	if texture:
+		# We have a texture, use it
+		card_icon.texture = texture
+		print("Texture set to card_icon")
+	else:
+		# No texture, show a placeholder or text
+		print("No texture found, using placeholder")
+		# You could set a default color or pattern here
+		card_icon.texture = null
+
+		# Optionally show text as fallback
+		var label = Label.new()
+		label.text = card.card_name
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_color_override("font_color", Color.WHITE)
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		card_front.add_child(label)
+
+	# Configure based on card type (you can keep this if you want different colors)
 	match card.card_type:
 		Card.CardType.PROBLEM:
 			_set_problem_card_visuals()

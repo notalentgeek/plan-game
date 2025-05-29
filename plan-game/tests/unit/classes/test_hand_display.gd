@@ -285,3 +285,176 @@ func test_add_card_success() -> void:
 
 	# Clean up
 	hand_display.queue_free()
+
+func test_add_card_returns_true_on_success() -> void:
+	"""
+	Test that add_card returns true when successfully adding valid cards.
+	Task 3.3.4: Verify return value accurately indicates successful addition.
+	"""
+	# Arrange - Create HandDisplay instance and test cards
+	var hand_display = HandDisplay.new()
+	var test_card1 = ProblemCard.new(
+		"test_return_1",
+		"Return Test Card 1",
+		"First card for return value testing",
+		"", # No texture path
+		"R",
+		6
+	)
+	var test_card2 = SolutionCard.new(
+		"test_return_2",
+		"Return Test Card 2",
+		"Second card for return value testing",
+		"", # No texture path
+		["R"], # Solves problem R
+		false # Not ultimate
+	)
+
+	# Act & Assert - Test first card addition
+	var result1 = hand_display.add_card(test_card1)
+	assert_equal(result1, true, "add_card should return true for first valid card")
+
+	# Act & Assert - Test second card addition
+	var result2 = hand_display.add_card(test_card2)
+	assert_equal(result2, true, "add_card should return true for second valid card")
+
+	# Verify final state - both cards should be in hand
+	assert_equal(hand_display.cards.size(), 2, "Hand should contain 2 cards after successful additions")
+	assert_true(test_card1 in hand_display.cards, "First card should exist in hand")
+	assert_true(test_card2 in hand_display.cards, "Second card should exist in hand")
+
+	# Clean up
+	hand_display.queue_free()
+
+func test_get_card_count_empty() -> void:
+	"""
+	Test that get_card_count returns 0 for empty hand.
+	Task 4.1.2: Verify card count is 0 for empty hand.
+	"""
+	# Arrange - Create empty HandDisplay instance
+	var hand_display = HandDisplay.new()
+	
+	# Verify initial state is empty
+	assert_equal(hand_display.cards.size(), 0, "Cards array should start empty")
+	
+	# Act - Call get_card_count method
+	var result = hand_display.get_card_count()
+	
+	# Assert - Verify result is 0 for empty hand
+	assert_equal(result, 0, "get_card_count should return 0 for empty hand")
+	
+	# Assert - Verify return type is still integer
+	assert_true(typeof(result) == TYPE_INT, "get_card_count should return TYPE_INT")
+	
+	# Clean up
+	hand_display.queue_free()
+
+func test_get_card_count_with_cards() -> void:
+	"""
+	Test that get_card_count accurately reflects number of added cards.
+	Task 4.1.3: Verify card count matches number of added cards.
+	"""
+	# Arrange - Create HandDisplay instance and test cards
+	var hand_display = HandDisplay.new()
+	var test_card1 = ProblemCard.new(
+		"count_test_1",
+		"Count Test Card 1",
+		"First card for counting test",
+		"", # No texture path
+		"C",
+		2
+	)
+	var test_card2 = ProblemCard.new(
+		"count_test_2", 
+		"Count Test Card 2",
+		"Second card for counting test",
+		"", # No texture path
+		"D",
+		4
+	)
+	var test_card3 = SolutionCard.new(
+		"count_test_3",
+		"Count Test Card 3", 
+		"Third card for counting test",
+		"", # No texture path
+		["C", "D"], # Solves problems C and D
+		false # Not ultimate
+	)
+	
+	# Verify initial empty state
+	assert_equal(hand_display.get_card_count(), 0, "Should start with count of 0")
+	
+	# Act & Assert - Test progressive card addition
+	# Add first card
+	hand_display.add_card(test_card1)
+	assert_equal(hand_display.get_card_count(), 1, "Count should be 1 after adding first card")
+	
+	# Add second card
+	hand_display.add_card(test_card2)
+	assert_equal(hand_display.get_card_count(), 2, "Count should be 2 after adding second card")
+	
+	# Add third card
+	hand_display.add_card(test_card3)
+	assert_equal(hand_display.get_card_count(), 3, "Count should be 3 after adding third card")
+	
+	# Verify final state matches expected count
+	assert_equal(hand_display.cards.size(), 3, "Cards array should contain 3 cards")
+	assert_equal(hand_display.get_card_count(), hand_display.cards.size(), "get_card_count should match cards array size")
+	
+	# Clean up
+	hand_display.queue_free()
+	
+func test_add_card_updates_count() -> void:
+	"""
+	Integration test to verify adding cards updates count correctly.
+	Task 4.2.1: Verify integration between add_card and get_card_count methods.
+	"""
+	# Arrange - Create HandDisplay instance and test cards
+	var hand_display = HandDisplay.new()
+	var test_card1 = ProblemCard.new(
+		"integration_test_1",
+		"Integration Test Card 1",
+		"First card for add/count integration testing",
+		"", # No texture path
+		"I",
+		1
+	)
+	var test_card2 = SolutionCard.new(
+		"integration_test_2",
+		"Integration Test Card 2", 
+		"Second card for add/count integration testing",
+		"", # No texture path
+		["I"], # Solves problem I
+		false # Not ultimate
+	)
+	
+	# Step 1: Start with empty hand - verify initial state
+	assert_equal(hand_display.get_card_count(), 0, "Should start with count of 0")
+	
+	# Step 2: Add first card and check count increases
+	var add_result1 = hand_display.add_card(test_card1)
+	
+	# Verify addition was successful
+	assert_equal(add_result1, true, "First card addition should succeed")
+	
+	# Verify count increased correctly
+	assert_equal(hand_display.get_card_count(), 1, "Count should be 1 after adding first card")
+	
+	# Step 3: Add second card and verify count updates again
+	var add_result2 = hand_display.add_card(test_card2)
+	
+	# Verify second addition was successful
+	assert_equal(add_result2, true, "Second card addition should succeed")
+	
+	# Verify count increased correctly again
+	assert_equal(hand_display.get_card_count(), 2, "Count should be 2 after adding second card")
+	
+	# Integration validation - verify both methods work together correctly
+	assert_equal(hand_display.cards.size(), hand_display.get_card_count(), "Array size should match get_card_count result")
+	
+	# Verify both cards are actually present
+	assert_true(test_card1 in hand_display.cards, "First card should exist in hand")
+	assert_true(test_card2 in hand_display.cards, "Second card should exist in hand")
+	
+	# Clean up
+	hand_display.queue_free()

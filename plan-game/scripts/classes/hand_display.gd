@@ -68,7 +68,7 @@ func get_card_count() -> int:
 	Returns:
 		The number of cards in the hand
 	"""
-	return 0
+	return cards.size()
 
 func clear_hand() -> void:
 	"""

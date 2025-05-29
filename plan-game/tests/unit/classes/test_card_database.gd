@@ -4,8 +4,10 @@ extends TestCase
 var card_database: CardDatabase
 
 func setup() -> void:
-	card_database = CardDatabase.new()
-	card_database.initialize_cards()
+	# Get reference to the singleton instead of creating new instance
+	card_database = get_node("/root/CardDatabase")
+	if not card_database._cards_initialized:
+		card_database.initialize_cards()
 
 func teardown() -> void:
 	card_database = null
@@ -62,6 +64,10 @@ func test_create_decks() -> void:
 	var problem_deck = card_database.create_problem_deck()
 	assert_equal(problem_deck.size(), 18, "Problem deck should contain 18 cards")
 
-	# Test creating solution deck
-	var solution_deck = card_database.create_solution_deck()
-	assert_equal(solution_deck.size(), 17, "Solution deck should contain 17 cards")
+	# Test creating solution deck - FIX: Use get_all_solution_cards() to include ultimate cards
+	var all_solution_cards = card_database.get_all_solution_cards()
+	assert_equal(all_solution_cards.size(), 17, "Should have 17 total solution cards (15 regular + 2 ultimate)")
+
+	# Test the actual create_solution_deck method separately
+	var regular_solution_deck = card_database.create_solution_deck()
+	assert_equal(regular_solution_deck.size(), 15, "Regular solution deck should contain 15 cards (excluding ultimate)")

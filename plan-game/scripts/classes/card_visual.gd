@@ -240,6 +240,10 @@ func initialize(p_card: Card) -> void:
 		_create_card_structure()
 		_create_animations()
 
+	# Update visual elements with card data
+	card_name_label.text = card.card_name
+	card_description_label.text = card.description
+
 	# Get the texture
 	var texture = card.get_texture()
 	print("Initialize - card name: ", card.card_name)
@@ -253,7 +257,6 @@ func initialize(p_card: Card) -> void:
 	else:
 		# No texture, show a placeholder or text
 		print("No texture found, using placeholder")
-		# You could set a default color or pattern here
 		card_icon.texture = null
 
 		# Optionally show text as fallback
@@ -266,7 +269,7 @@ func initialize(p_card: Card) -> void:
 		label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		card_front.add_child(label)
 
-	# Configure based on card type (you can keep this if you want different colors)
+	# Configure based on card type
 	match card.card_type:
 		Card.CardType.PROBLEM:
 			_set_problem_card_visuals()

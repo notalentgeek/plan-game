@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2gxirtknnjul"]
+
+[ext_resource type="Script" uid="uid://byfh3su83ycoo" path="res://scripts/classes/hand_controller.gd" id="1_seg5x"]
+
+[node name="TestRunner" type="Node"]
+script = ExtResource("1_seg5x")

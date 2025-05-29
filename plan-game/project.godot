@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="PLAN: Play, Learn, and Act Now"
-run/main_scene="uid://bhbrm66bigh5k"
+run/main_scene="uid://dd1ht8825w3lt"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+CardDatabase="*res://scripts/autoload/card_database.gd"
 
 [display]
 

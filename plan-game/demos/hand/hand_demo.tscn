@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b6qt3av0alpfp"]
+
+[ext_resource type="Script" uid="uid://cdbw2dx81mb2w" path="res://demos/hand/hand_demo.gd" id="1_ojmlh"]
+
+[node name="HandDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_ojmlh")

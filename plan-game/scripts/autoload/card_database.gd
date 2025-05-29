@@ -1,6 +1,6 @@
 # scripts/autoload/card_database.gd
 extends Node
-class_name CardDatabase
+# class_name CardDatabase
 
 """
 Singleton that manages the collection of all card definitions in the PLAN game.
@@ -499,6 +499,36 @@ func get_all_solution_cards() -> Array[SolutionCard]:
 		cards.append(card)
 	return cards
 
+func get_cards_by_type(card_type: Card.CardType) -> Array[Card]:
+	"""
+	Get all cards of a specific type, returning them as Array[Card].
+	This helper method handles the array type conversion.
+
+	Args:
+		card_type: The type of cards to retrieve
+
+	Returns:
+		An array of cards of the specified type
+	"""
+	var cards: Array[Card] = []
+	match card_type:
+		Card.CardType.PROBLEM:
+			var problem_cards = get_all_problem_cards()
+			cards.assign(problem_cards)
+		Card.CardType.SOLUTION:
+			var solution_cards = get_all_solution_cards()
+			# Filter out ultimate cards for regular solution requests
+			for card in solution_cards:
+				if not card.is_ultimate:
+					cards.append(card)
+		Card.CardType.ULTIMATE:
+			var solution_cards = get_all_solution_cards()
+			# Filter for ultimate cards only
+			for card in solution_cards:
+				if card.is_ultimate:
+					cards.append(card)
+	return cards
+
 func get_problem_cards_by_letter(letter_code: String) -> Array[ProblemCard]:
 	"""
 	Get all problem cards with the specified letter code.
@@ -551,7 +581,7 @@ func create_problem_deck() -> Deck:
 	Returns:
 		A deck containing all problem cards
 	"""
-	return Deck.new(get_all_problem_cards())
+	return Deck.new(get_cards_by_type(Card.CardType.PROBLEM))
 
 func create_solution_deck() -> Deck:
 	"""
@@ -560,4 +590,17 @@ func create_solution_deck() -> Deck:
 	Returns:
 		A deck containing all solution cards
 	"""
-	return Deck.new(get_all_solution_cards())
+	return Deck.new(get_cards_by_type(Card.CardType.SOLUTION))
+
+func create_full_deck() -> Deck:
+	"""
+	Create a new deck containing all cards (problems, solutions, and ultimate cards).
+
+	Returns:
+		A deck containing all cards
+	"""
+	var all_cards: Array[Card] = []
+	all_cards.append_array(get_cards_by_type(Card.CardType.PROBLEM))
+	all_cards.append_array(get_cards_by_type(Card.CardType.SOLUTION))
+	all_cards.append_array(get_cards_by_type(Card.CardType.ULTIMATE))
+	return Deck.new(all_cards)

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="PLAN: Play, Learn, and Act Now"
-run/main_scene="uid://dbrux0jg433fk"
+run/main_scene="uid://dd1ht8825w3lt"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 

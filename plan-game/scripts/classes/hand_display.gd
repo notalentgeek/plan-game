@@ -51,15 +51,23 @@ func add_card(card: Card) -> bool:
 
 func remove_card(index: int) -> bool:
 	"""
-	Remove a card from the hand display at the specified index.
+	Remove a card from the hand at the specified index.
 
 	Args:
-		index: The index of the card to remove from the hand
+		index: The index of the card to remove (0-based)
 
 	Returns:
-		True if the card was successfully removed, false otherwise
+		bool: True if removal was successful, false if invalid index
 	"""
-	return false
+	# Bounds validation - reject invalid indices
+	if index < 0 or index >= cards.size():
+		return false
+
+	# Remove card at specified index
+	cards.remove_at(index)
+
+	# Return success for valid removal
+	return true
 
 func get_card_count() -> int:
 	"""

@@ -82,4 +82,31 @@ func clear_hand() -> void:
 	"""
 	Clear all cards from the hand display.
 	"""
-	pass
+	cards.clear()
+
+func _calculate_fan_positions() -> Array[Vector2]:
+	"""
+	Calculate fan positions for cards in the hand display.
+
+	Returns:
+		Array[Vector2]: Array of positions for each card in fan layout
+	"""
+	# Array to store calculated positions
+	var positions: Array[Vector2] = []
+
+	# Handle empty cards case
+	if cards.is_empty():
+		return []
+
+	# Handle single card case
+	if cards.size() == 1:
+		return [Vector2(400, 300)]
+
+	# Handle multiple cards case
+	for i in range(cards.size()):
+		# Calculate angle for this card position (placeholder)
+		var angle = i * 0.1
+		# Calculate and append position for this card
+		positions.append(Vector2(400 + i * 50, 300))
+
+	return positions

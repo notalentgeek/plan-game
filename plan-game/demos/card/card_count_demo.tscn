@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2yxd3ueolh8r"]
+[gd_scene load_steps=2 format=3 uid="uid://dbrux0jg433fk"]
 
 [ext_resource type="Script" path="res://demos/card/card_count_demo.gd" id="1_x0f5r"]
 

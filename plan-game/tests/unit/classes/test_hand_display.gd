@@ -576,3 +576,453 @@ func test_remove_card_updates_count() -> void:
 
 	# Cleanup
 	hand_display.queue_free()
+
+func test_remove_card_success() -> void:
+	"""
+	Test successful card removal from hand array.
+
+	Validates that remove_card() successfully removes a card from the array
+	and that the removed card is no longer present in the collection.
+	"""
+	# Arrange
+	var hand_display = _create_fresh_hand_display()
+	var test_card = _create_test_problem_card("success_removal")
+
+	# Add card to establish initial state
+	var add_result = hand_display.add_card(test_card)
+	assert_equal(add_result, true, "Card addition must succeed for test setup")
+	assert_equal(hand_display.cards.size(), 1, "Hand must contain exactly one card")
+	assert_true(test_card in hand_display.cards, "Test card must exist in hand initially")
+
+	# Act - Remove the card by index
+	var removal_result = hand_display.remove_card(0)
+
+	# Assert - Verify successful removal
+	assert_equal(removal_result, true, "remove_card must return true for valid index")
+
+	# Assert - Verify card no longer in array
+	assert_equal(test_card in hand_display.cards, false, "Removed card must no longer exist in hand")
+
+	# Assert - Verify array state after removal
+	assert_equal(hand_display.cards.size(), 0, "Hand must be empty after removing only card")
+	assert_true(hand_display.cards.is_empty(), "Cards array must be empty after successful removal")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_remove_card_from_empty_hand() -> void:
+	"""
+	Test that removing from empty hand is handled safely.
+
+	Validates that remove_card() gracefully handles empty hand scenarios
+	without errors and returns false appropriately.
+	"""
+	# Arrange - Start with empty hand
+	var hand_display = _create_fresh_hand_display()
+
+	# Verify initial empty state
+	assert_equal(hand_display.cards.size(), 0, "Hand must start empty for test")
+	assert_equal(hand_display.get_card_count(), 0, "Card count must be 0 for empty hand")
+	assert_true(hand_display.cards.is_empty(), "Cards array must be empty initially")
+
+	# Act - Attempt to remove card from empty hand
+	var removal_result = hand_display.remove_card(0)
+
+	# Assert - Verify safe failure
+	assert_equal(removal_result, false, "Empty hand removal must return false")
+
+	# Assert - Verify no errors or state corruption
+	assert_equal(hand_display.cards.size(), 0, "Hand must remain empty after failed removal")
+	assert_equal(hand_display.get_card_count(), 0, "Card count must remain 0 after failed removal")
+	assert_true(hand_display.cards.is_empty(), "Cards array must remain empty after failed removal")
+
+	# Additional edge case validation - test multiple indices
+	var negative_removal = hand_display.remove_card(-1)
+	var large_removal = hand_display.remove_card(999)
+
+	assert_equal(negative_removal, false, "Negative index on empty hand must return false")
+	assert_equal(large_removal, false, "Large index on empty hand must return false")
+
+	# Final state verification - ensure no corruption occurred
+	assert_equal(hand_display.cards.size(), 0, "Hand must still be empty after all removal attempts")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_remove_card_last_remaining() -> void:
+	"""
+	Test that removing the last remaining card works correctly.
+
+	Validates that remove_card() properly handles the edge case of removing
+	the final card from a hand, leaving it in a clean empty state.
+	"""
+	# Arrange - Add single card to hand
+	var hand_display = _create_fresh_hand_display()
+	var test_card = _create_test_problem_card("last_remaining")
+
+	# Establish initial single-card state
+	var add_result = hand_display.add_card(test_card)
+	assert_equal(add_result, true, "Card addition must succeed for test setup")
+	assert_equal(hand_display.cards.size(), 1, "Hand must contain exactly one card initially")
+	assert_equal(hand_display.get_card_count(), 1, "Card count must be 1 initially")
+	assert_true(test_card in hand_display.cards, "Test card must exist in hand initially")
+
+	# Act - Remove the only card
+	var removal_result = hand_display.remove_card(0)
+
+	# Assert - Verify successful removal
+	assert_equal(removal_result, true, "Last card removal must return true")
+
+	# Assert - Verify hand becomes properly empty
+	assert_equal(hand_display.cards.size(), 0, "Hand must be empty after removing last card")
+	assert_equal(hand_display.get_card_count(), 0, "Card count must be 0 after removing last card")
+	assert_true(hand_display.cards.is_empty(), "Cards array must be empty after removing last card")
+
+	# Assert - Verify removed card is no longer present
+	assert_equal(test_card in hand_display.cards, false, "Removed card must no longer exist in hand")
+
+	# Edge case validation - verify empty hand behavior after last card removal
+	var subsequent_removal = hand_display.remove_card(0)
+	assert_equal(subsequent_removal, false, "Removal from now-empty hand must return false")
+	assert_equal(hand_display.cards.size(), 0, "Hand must remain empty after failed subsequent removal")
+
+	# Final state verification - confirm clean empty state
+	assert_equal(hand_display.get_card_count(), 0, "Final card count must be 0")
+	assert_true(hand_display.cards.is_empty(), "Final cards array must be empty")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_clear_hand_empties_array() -> void:
+	"""
+	Test that clear_hand empties the cards array.
+
+	Validates that clear_hand() properly removes all cards from the array,
+	leaving it in a clean empty state.
+	"""
+	# Arrange - Add multiple cards to hand
+	var hand_display = _create_fresh_hand_display()
+	var test_cards = [
+		_create_test_problem_card("clear_test_1"),
+		_create_test_solution_card("clear_test_2"),
+		_create_test_problem_card("clear_test_3")
+	]
+
+	# Add all test cards to establish populated state
+	for card in test_cards:
+		var add_result = hand_display.add_card(card)
+		assert_equal(add_result, true, "Card addition must succeed for test setup")
+
+	# Verify initial populated state
+	assert_equal(hand_display.cards.size(), 3, "Hand must contain 3 cards before clearing")
+	assert_equal(hand_display.get_card_count(), 3, "Card count must be 3 before clearing")
+
+	# Verify all cards are present
+	for card in test_cards:
+		assert_true(card in hand_display.cards, "All test cards must exist in hand before clearing")
+
+	# Act - Call clear_hand
+	hand_display.clear_hand()
+
+	# Assert - Verify array becomes empty after clear
+	assert_equal(hand_display.cards.size(), 0, "Cards array must be empty after clear_hand")
+	assert_true(hand_display.cards.is_empty(), "Cards array must report empty after clear_hand")
+
+	# Assert - Verify all cards are removed
+	for card in test_cards:
+		assert_equal(card in hand_display.cards, false, "No test cards must exist in hand after clearing")
+
+	# Assert - Verify count integration
+	assert_equal(hand_display.get_card_count(), 0, "Card count must be 0 after clearing")
+
+	# Additional validation - verify array is ready for new additions
+	var new_card = _create_test_problem_card("post_clear")
+	var add_after_clear = hand_display.add_card(new_card)
+	assert_equal(add_after_clear, true, "Array must accept new cards after clearing")
+	assert_equal(hand_display.cards.size(), 1, "Array must contain new card after post-clear addition")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_clear_hand_resets_count() -> void:
+	"""
+	Test that clear_hand resets card count to 0.
+
+	Validates that clear_hand() properly resets the card count to zero,
+	ensuring integration between clear_hand and get_card_count methods.
+	"""
+	# Arrange - Add multiple cards to hand
+	var hand_display = _create_fresh_hand_display()
+	var test_cards = [
+		_create_test_problem_card("count_reset_1"),
+		_create_test_solution_card("count_reset_2", ["C"]),
+		_create_test_problem_card("count_reset_3"),
+		_create_test_solution_card("count_reset_4", ["D"])
+	]
+
+	# Add all test cards to establish populated state
+	for card in test_cards:
+		var add_result = hand_display.add_card(card)
+		assert_equal(add_result, true, "Card addition must succeed for test setup")
+
+	# Verify initial populated count
+	var initial_count = hand_display.get_card_count()
+	assert_equal(initial_count, 4, "Hand must contain 4 cards before clearing")
+	assert_equal(hand_display.cards.size(), initial_count, "Array size must match count before clearing")
+
+	# Act - Call clear_hand
+	hand_display.clear_hand()
+
+	# Assert - Verify card count becomes 0 after clear
+	var final_count = hand_display.get_card_count()
+	assert_equal(final_count, 0, "Card count must be 0 after clear_hand")
+
+	# Assert - Verify integration between clear and count works
+	assert_equal(hand_display.cards.size(), final_count, "Array size must match count after clearing")
+	assert_equal(hand_display.cards.size(), 0, "Array size must be 0 after clearing")
+
+	# Additional validation - verify count progression from populated to empty
+	assert_equal(final_count, initial_count - 4, "Count must decrease by exactly 4 (from 4 to 0)")
+	assert_not_equal(final_count, initial_count, "Final count must be different from initial count")
+
+	# Edge case validation - verify count remains 0 after multiple clear calls
+	hand_display.clear_hand()
+	var second_clear_count = hand_display.get_card_count()
+	assert_equal(second_clear_count, 0, "Count must remain 0 after second clear_hand call")
+
+	# Integration validation - verify count works correctly after clearing
+	var post_clear_card = _create_test_problem_card("post_clear_count")
+	hand_display.add_card(post_clear_card)
+	var post_add_count = hand_display.get_card_count()
+	assert_equal(post_add_count, 1, "Count must be 1 after adding card to cleared hand")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_calculate_fan_positions_method_existence_and_accessibility() -> void:
+	"""
+	Validate _calculate_fan_positions method exists and is accessible.
+
+	Tests method existence, callable interface, and return type consistency
+	following the established testing patterns for private calculation methods.
+	"""
+	# Arrange
+	var hand_display = _create_fresh_hand_display()
+
+	# Act & Assert - Method existence verification
+	assert_true(
+		hand_display.has_method("_calculate_fan_positions"),
+		"HandDisplay must expose _calculate_fan_positions method"
+	)
+
+	# Act & Assert - Method accessibility and return type
+	var result = hand_display._calculate_fan_positions()
+	assert_not_null(result, "_calculate_fan_positions must return non-null value")
+	assert_true(result is Array, "_calculate_fan_positions must return Array type")
+
+	# Act & Assert - Default behavior validation
+	assert_equal(result.size(), 0, "_calculate_fan_positions must return empty array by default")
+	assert_true(result.is_empty(), "Default return array must be empty")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_calculate_fan_positions_returns_array_type() -> void:
+	"""
+	Validate _calculate_fan_positions returns proper Array type.
+
+	Tests return type validation, type safety compliance, and interface consistency
+	following the established testing patterns for method return type verification.
+	"""
+	# Arrange
+	var hand_display = _create_fresh_hand_display()
+
+	# Act - Call the method to get return value
+	var result = hand_display._calculate_fan_positions()
+
+	# Assert - Return type validation
+	assert_not_null(result, "_calculate_fan_positions must return non-null value")
+	assert_true(result is Array, "_calculate_fan_positions must return Array type")
+
+	# Assert - Type safety confirmation
+	assert_true(typeof(result) == TYPE_ARRAY, "_calculate_fan_positions must return TYPE_ARRAY")
+
+	# Assert - Interface consistency validation
+	var second_call = hand_display._calculate_fan_positions()
+	assert_true(second_call is Array, "Multiple calls must consistently return Array type")
+	assert_true(typeof(second_call) == TYPE_ARRAY, "Type consistency must be maintained across calls")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_fan_positions_empty_hand() -> void:
+	"""
+	Validate _calculate_fan_positions returns empty array for empty hand.
+
+	Tests empty hand edge case handling, ensuring method returns empty position
+	array when no cards are present in the hand display.
+	"""
+	# Arrange - Start with empty hand
+	var hand_display = _create_fresh_hand_display()
+
+	# Verify initial empty state
+	assert_equal(hand_display.cards.size(), 0, "Hand must start empty for test")
+	assert_true(hand_display.cards.is_empty(), "Cards array must be empty initially")
+	assert_equal(hand_display.get_card_count(), 0, "Card count must be 0 for empty hand")
+
+	# Act - Call _calculate_fan_positions on empty hand
+	var result = hand_display._calculate_fan_positions()
+
+	# Assert - Verify empty array returned
+	assert_not_null(result, "_calculate_fan_positions must return non-null value")
+	assert_true(result is Array, "_calculate_fan_positions must return Array type")
+	assert_equal(result.size(), 0, "Empty hand must return empty position array")
+	assert_true(result.is_empty(), "Position array must be empty for empty hand")
+
+	# Assert - Verify return type consistency
+	assert_true(typeof(result) == TYPE_ARRAY, "Return type must be TYPE_ARRAY")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_fan_positions_single_card() -> void:
+	"""
+	Validate _calculate_fan_positions returns center position for single card.
+
+	Tests single card positioning logic, ensuring method returns exactly one
+	position at center coordinates when hand contains one card.
+	"""
+	# Arrange - Add single card to hand
+	var hand_display = _create_fresh_hand_display()
+	var test_card = _create_test_problem_card("single_position")
+
+	# Add card and verify single card state
+	var add_result = hand_display.add_card(test_card)
+	assert_equal(add_result, true, "Card addition must succeed for test setup")
+	assert_equal(hand_display.cards.size(), 1, "Hand must contain exactly one card")
+	assert_equal(hand_display.get_card_count(), 1, "Card count must be 1 for single card")
+	assert_true(test_card in hand_display.cards, "Test card must exist in hand")
+
+	# Act - Call _calculate_fan_positions on single card hand
+	var result = hand_display._calculate_fan_positions()
+
+	# Assert - Verify single position returned
+	assert_not_null(result, "_calculate_fan_positions must return non-null value")
+	assert_true(result is Array, "_calculate_fan_positions must return Array type")
+	assert_equal(result.size(), 1, "Single card must return exactly one position")
+	assert_equal(result.is_empty(), false, "Position array must not be empty for single card")
+
+	# Assert - Verify center position coordinates
+	var position = result[0]
+	assert_not_null(position, "Position must not be null")
+	assert_true(position is Vector2, "Position must be Vector2 type")
+	assert_equal(position.x, 400, "Single card X position must be 400 (center)")
+	assert_equal(position.y, 300, "Single card Y position must be 300 (center)")
+
+	# Assert - Verify position is reasonable
+	assert_true(position.x > 0, "X position must be positive")
+	assert_true(position.y > 0, "Y position must be positive")
+	assert_true(position.x < 1000, "X position must be reasonable for display")
+	assert_true(position.y < 800, "Y position must be reasonable for display")
+
+	# Assert - Verify type consistency
+	assert_true(typeof(result) == TYPE_ARRAY, "Return type must be TYPE_ARRAY")
+	assert_true(typeof(position) == TYPE_VECTOR2, "Position type must be TYPE_VECTOR2")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_fan_positions_multiple_cards() -> void:
+	"""
+	Test that multiple cards return correct number of positions.
+	Verifies that position count matches card count for multiple cards.
+	"""
+	# Arrange - Create fresh hand display instance
+	var hand_display = _create_fresh_hand_display()
+
+	# Add multiple cards to hand (3 cards for testing)
+	var card1 = ProblemCard.new("test_1", "Test Card 1", "Description 1", "", "A", 1)
+	var card2 = ProblemCard.new("test_2", "Test Card 2", "Description 2", "", "B", 2)
+	var card3 = ProblemCard.new("test_3", "Test Card 3", "Description 3", "", "C", 3)
+
+	hand_display.add_card(card1)
+	hand_display.add_card(card2)
+	hand_display.add_card(card3)
+
+	# Call _calculate_fan_positions to get position array
+	var positions = hand_display._calculate_fan_positions()
+
+	# Verify array size matches card count
+	assert_equal(positions.size(), 3, "Position count should match card count (3)")
+	assert_equal(positions.size(), hand_display.get_card_count(), "Position count should match hand card count")
+
+	# Verify all positions are Vector2 instances
+	for i in range(positions.size()):
+		assert_true(positions[i] is Vector2, "Position " + str(i) + " should be Vector2")
+
+	# Verify positions are unique (no duplicate positions)
+	assert_true(positions[0] != positions[1], "Card 0 and 1 should have different positions")
+	assert_true(positions[1] != positions[2], "Card 1 and 2 should have different positions")
+	assert_true(positions[0] != positions[2], "Card 0 and 2 should have different positions")
+
+	# Cleanup
+	hand_display.queue_free()
+
+func test_fan_positions_different_for_each_card() -> void:
+	"""
+	Create test to verify each card gets unique position.
+	Validates that positioning algorithm assigns different positions to each card.
+	"""
+	# Arrange - Create fresh hand display instance
+	var hand_display = _create_fresh_hand_display()
+
+	# Add multiple cards to hand (4 cards for comprehensive testing)
+	var card1 = _create_test_problem_card("unique_pos_1")
+	var card2 = _create_test_problem_card("unique_pos_2")
+	var card3 = _create_test_solution_card("unique_pos_3")
+	var card4 = _create_test_solution_card("unique_pos_4")
+
+	hand_display.add_card(card1)
+	hand_display.add_card(card2)
+	hand_display.add_card(card3)
+	hand_display.add_card(card4)
+
+	# Act - Get position array from positioning algorithm
+	var positions = hand_display._calculate_fan_positions()
+
+	# Assert - Verify all positions are different (comprehensive uniqueness check)
+	for i in range(positions.size()):
+		for j in range(i + 1, positions.size()):
+			var pos_i = positions[i]
+			var pos_j = positions[j]
+			assert_true(
+				pos_i != pos_j,
+				"Position %d (%s) must be different from position %d (%s)" % [i, str(pos_i), j, str(pos_j)]
+			)
+
+			# Additional validation - verify no coordinate overlap
+			var x_different = pos_i.x != pos_j.x
+			var y_different = pos_i.y != pos_j.y
+			assert_true(
+				x_different or y_different,
+				"Cards %d and %d must not have identical coordinates" % [i, j]
+			)
+
+	# Assert - Verify positioning algorithm works (basic positioning validation)
+	assert_equal(positions.size(), 4, "Must have exactly 4 positions for 4 cards")
+
+	# Verify all positions are valid Vector2 instances
+	for i in range(positions.size()):
+		assert_true(positions[i] is Vector2, "Position %d must be Vector2 type" % i)
+		assert_true(typeof(positions[i]) == TYPE_VECTOR2, "Position %d must be TYPE_VECTOR2" % i)
+
+	# Verify positions are reasonable (within expected display bounds)
+	for i in range(positions.size()):
+		var pos = positions[i]
+		assert_true(pos.x >= 0, "Position %d X coordinate must be non-negative" % i)
+		assert_true(pos.y >= 0, "Position %d Y coordinate must be non-negative" % i)
+		assert_true(pos.x <= 1000, "Position %d X coordinate must be within display bounds" % i)
+		assert_true(pos.y <= 800, "Position %d Y coordinate must be within display bounds" % i)
+
+	# Cleanup
+	hand_display.queue_free()

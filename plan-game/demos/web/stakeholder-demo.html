@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLAN Card Game - Interactive Card Table</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #0f3460 0%, #16537e 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* Game table layout */
+        .game-table {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(34, 139, 34, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #1a472a 0%, #0d2818 100%);
+            z-index: 2;
+        }
+
+        /* Center deck area */
+        .center-area {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .deck-area {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .deck {
+            width: 140px;
+            height: 200px;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            border: 3px solid #ecf0f1;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .deck:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+        }
+
+        .deck::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 140px;
+            height: 200px;
+            background: linear-gradient(145deg, #1a252f, #2c3e50);
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        .deck::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 140px;
+            height: 200px;
+            background: linear-gradient(145deg, #243342, #2c3e50);
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        .deck-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ecf0f1;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .deck-count {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Problem card area (center top) */
+        .problem-area {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .problem-label {
+            color: #ecf0f1;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Player hand area (bottom) */
+        .player-hand {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1000px;
+            height: 220px;
+            z-index: 10;
+        }
+
+        .hand-label {
+            text-align: center;
+            color: #ecf0f1;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hand-cards {
+            position: relative;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        /* Card styling */
+        .card {
+            width: 120px;
+            height: 170px;
+            border-radius: 12px;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center bottom;
+            font-size: 11px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-20px) scale(1.05);
+            z-index: 1000 !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card.selected {
+            transform: translateY(-30px) scale(1.1);
+            z-index: 1001 !important;
+            box-shadow: 0 25px 50px rgba(255, 215, 0, 0.5);
+            border-color: #ffd700;
+        }
+
+        .card.problem {
+            background: linear-gradient(145deg, #ffebee, #ffcdd2);
+            border-color: #f44336;
+        }
+
+        .card.solution {
+            background: linear-gradient(145deg, #e8f5e8, #c8e6c9);
+            border-color: #4CAF50;
+        }
+
+        .card.ultimate {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            border-color: #2196F3;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .card-type-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #2c3e50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .card.problem .card-type-badge {
+            background: #e74c3c;
+        }
+
+        .card.solution .card-type-badge {
+            background: #27ae60;
+        }
+
+        .card.ultimate .card-type-badge {
+            background: #3498db;
+        }
+
+        .card-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .card-description {
+            font-size: 9px;
+            color: #555;
+            text-align: center;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            flex: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+        }
+
+        .card-icon {
+            text-align: center;
+            font-size: 24px;
+            margin: 8px 0;
+        }
+
+        .card-footer {
+            text-align: center;
+            font-size: 8px;
+            color: #666;
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Status display */
+        .status-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 20;
+            max-width: 300px;
+        }
+
+        .status-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+
+        .status-message {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #bdc3c7;
+        }
+
+        .status-message.success {
+            color: #2ecc71;
+        }
+
+        .status-message.error {
+            color: #e74c3c;
+        }
+
+        /* Educational popup */
+        .educational-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #27ae60;
+            z-index: 1000;
+            max-width: 500px;
+            text-align: center;
+            display: none;
+        }
+
+        .educational-popup.show {
+            display: block;
+            animation: popupAppear 0.5s ease-out;
+        }
+
+        @keyframes popupAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.7);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .popup-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+
+        .popup-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ecf0f1;
+            margin-bottom: 20px;
+        }
+
+        .popup-close {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .center-area {
+                width: 250px;
+                height: 250px;
+            }
+
+            .deck {
+                width: 120px;
+                height: 170px;
+            }
+
+            .card {
+                width: 100px;
+                height: 140px;
+                font-size: 9px;
+                padding: 8px;
+            }
+
+            .player-hand {
+                height: 180px;
+            }
+
+            .hand-cards {
+                height: 150px;
+            }
+
+            .controls {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Game animations */
+        @keyframes cardDeal {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -200px) rotate(0deg);
+            }
+            to {
+                opacity: 1;
+                transform: translate(0, 0) rotate(var(--rotation));
+            }
+        }
+
+        @keyframes deckGlow {
+            0%, 100% {
+                box-shadow:
+                    0 20px 40px rgba(0, 0, 0, 0.3),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow:
+                    0 20px 40px rgba(0, 0, 0, 0.3),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                    0 0 30px rgba(52, 152, 219, 0.5);
+            }
+        }
+
+        .deck.active {
+            animation: deckGlow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Game table -->
+    <div class="game-table">
+        <!-- Status display -->
+        <div class="status-display">
+            <div class="status-title">🌍 PLAN Card Game</div>
+            <div class="status-message" id="statusMessage">
+                Click the deck to draw cards. Select solutions to solve environmental problems!
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" onclick="newGame()">🎮 New Game</button>
+            <button class="control-btn" onclick="drawCard()">🃏 Draw Card</button>
+            <button class="control-btn" onclick="clearHand()">🗑️ Clear Hand</button>
+            <button class="control-btn" onclick="showHelp()">❓ Help</button>
+        </div>
+
+        <!-- Problem area (top center) -->
+        <div class="problem-area">
+            <div class="problem-label">Current Environmental Problem</div>
+            <div id="problemCard"></div>
+        </div>
+
+        <!-- Center deck area -->
+        <div class="center-area">
+            <div class="deck-area">
+                <div class="deck active" onclick="drawCard()" id="mainDeck">
+                    <div class="deck-label">PLAN<br>Cards</div>
+                    <div class="deck-count" id="deckCount">86</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player hand (bottom) -->
+        <div class="player-hand">
+            <div class="hand-label">Your Cards - Select a solution!</div>
+            <div class="hand-cards" id="handCards"></div>
+        </div>
+    </div>
+
+    <!-- Educational popup -->
+    <div class="educational-popup" id="educationalPopup">
+        <div class="popup-title" id="popupTitle">Great Choice!</div>
+        <div class="popup-content" id="popupContent"></div>
+        <button class="popup-close" onclick="closePopup()">Continue</button>
+    </div>
+
+    <script>
+        // Game data based on real PLAN cards
+        const problemCards = [
+            {
+                id: "A", name: "Plastic Pollution", description: "Accumulation of plastic waste in the environment that causes harm to wildlife, wildlife habitat, and humans.",
+                severity: 24, icon: "🏭", solutions: ["A", "L", "M", "N", "P", "Q", "R"]
+            },
+            {
+                id: "B", name: "Oil Spill", description: "The discharge of crude oil on the environment such as land and water bodies that destroys the quality of the environment.",
+                severity: 90, icon: "🛢️", solutions: ["A", "B", "C", "D", "E", "G", "H", "I", "J", "L", "M", "N", "O", "P", "Q", "R"]
+            },
+            {
+                id: "C", name: "Deforestation", description: "The act of cutting down trees or clearing a large area of forest which reduces the quality of nature.",
+                severity: 48, icon: "🌳", solutions: ["B", "C", "D", "L", "M", "P", "R"]
+            },
+            {
+                id: "L", name: "Global Warming", description: "A situation whereby the Earth becomes warmer due to an increase in average surface temperature caused by human and natural factors.",
+                severity: 110, icon: "🌡️", solutions: ["L", "M", "P", "R"]
+            },
+            {
+                id: "R", name: "Air Pollution", description: "The discharge of harmful substances that can contaminate the air and affect its quality to support human life.",
+                severity: 45, icon: "🏭", solutions: ["A", "B", "C", "D", "E", "G", "H", "I", "J", "L", "M", "N", "O", "P", "Q", "R"]
+            }
+        ];
+
+        const solutionCards = [
+            {
+                id: "A", name: "Advocacy", description: "The process of promoting and supporting actions, policies and practices that protect and preserve the environment.",
+                solves: ["A", "B", "R"], icon: "📢", isUltimate: false,
+                educationalInfo: "Advocacy empowers communities to voice environmental concerns and push for policy changes that protect our planet."
+            },
+            {
+                id: "B", name: "End Fossil Fuel Exploitation", description: "A call to stop the extraction of petroleum crude oil from the ground, hence stopping harmful environmental contamination.",
+                solves: ["B", "C", "L", "R"], icon: "⛽", isUltimate: false,
+                educationalInfo: "Ending fossil fuel exploitation is crucial for reducing greenhouse gas emissions and preventing environmental destruction."
+            },
+            {
+                id: "C", name: "Renewable Energy", description: "Solar, wind, and hydroelectric power systems that reduce carbon emissions and provide sustainable electricity.",
+                solves: ["B", "C", "L", "R"], icon: "☀️", isUltimate: false,
+                educationalInfo: "Renewable energy can reduce CO2 emissions by up to 80% compared to fossil fuels, directly addressing climate change."
+            },
+            {
+                id: "L", name: "Use Eco-friendly Items", description: "Make intentional choices to use products and items that do not cause any negative or harmful environmental impacts.",
+                solves: ["A", "L", "R"], icon: "🌱", isUltimate: false,
+                educationalInfo: "Eco-friendly products reduce toxic chemicals in our environment and promote sustainable manufacturing practices."
+            },
+            {
+                id: "U1", name: "Environmental Education", description: "A process or system that helps individuals, communities, and society to learn and understand best environmental practices.",
+                solves: ["A", "B", "C", "L", "R"], icon: "📚", isUltimate: true,
+                educationalInfo: "Education is the ultimate solution - when people understand environmental issues, they take action to solve them!"
+            },
+            {
+                id: "U2", name: "Eco-friendly Practice", description: "The adoption of practices, behaviours and lifestyles that promote a safer, healthier, and more sustainable environment.",
+                solves: ["A", "B", "C", "L", "R"], icon: "🌍", isUltimate: true,
+                educationalInfo: "Individual actions matter! When everyone adopts eco-friendly practices, we create massive positive environmental change."
+            }
+        ];
+
+        // Game state
+        let deck = [...problemCards, ...solutionCards];
+        let playerHand = [];
+        let currentProblem = null;
+        let selectedCard = null;
+        let gameStarted = false;
+
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function updateDeckCount() {
+            document.getElementById('deckCount').textContent = deck.length;
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+        }
+
+        function drawCard() {
+            if (deck.length === 0) {
+                updateStatus('Deck is empty! Start a new game.', 'error');
+                return;
+            }
+
+            if (playerHand.length >= 7) {
+                updateStatus('Hand is full! Play a card first.', 'error');
+                return;
+            }
+
+            const card = deck.pop();
+            playerHand.push(card);
+
+            updateDeckCount();
+            renderHand();
+
+            if (!currentProblem && card.severity !== undefined) {
+                setCurrentProblem(card);
+                updateStatus(`New problem: ${card.name}! Draw solution cards to solve it.`);
+            } else {
+                updateStatus(`Drew: ${card.name}`);
+            }
+        }
+
+        function setCurrentProblem(problemCard) {
+            currentProblem = problemCard;
+            const problemArea = document.getElementById('problemCard');
+
+            problemArea.innerHTML = `
+                <div class="card problem" style="position: static; transform: none; margin: 0 auto;">
+                    <div class="card-type-badge">Problem ${problemCard.id}</div>
+                    <div class="card-header">${problemCard.name}</div>
+                    <div class="card-icon">${problemCard.icon}</div>
+                    <div class="card-description">${problemCard.description}</div>
+                    <div class="card-footer">Severity: ${problemCard.severity}</div>
+                </div>
+            `;
+        }
+
+        function calculateHandPosition(index, total) {
+            if (total === 1) {
+                return { x: 0, rotation: 0 };
+            }
+
+            const maxSpread = Math.min(800, total * 100);
+            const angleStep = Math.min(30, 180 / (total - 1));
+            const startAngle = -(angleStep * (total - 1)) / 2;
+            const angle = startAngle + (index * angleStep);
+
+            const radius = 400;
+            const x = Math.sin(angle * Math.PI / 180) * radius;
+            const y = Math.cos(angle * Math.PI / 180) * 50;
+
+            return { x, y: -y, rotation: angle * 0.7 };
+        }
+
+        function renderHand() {
+            const handContainer = document.getElementById('handCards');
+            handContainer.innerHTML = '';
+
+            playerHand.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = `card ${card.isUltimate ? 'ultimate' : (card.severity !== undefined ? 'problem' : 'solution')}`;
+
+                const position = calculateHandPosition(index, playerHand.length);
+                cardElement.style.left = `calc(50% + ${position.x}px)`;
+                cardElement.style.bottom = `${position.y}px`;
+                cardElement.style.transform = `translateX(-50%) rotate(${position.rotation}deg)`;
+                cardElement.style.setProperty('--rotation', `${position.rotation}deg`);
+                cardElement.style.zIndex = index + 1;
+
+                const cardType = card.isUltimate ? 'ULTIMATE' : (card.severity !== undefined ? `Problem ${card.id}` : `Solution ${card.id}`);
+                const footerText = card.severity !== undefined ?
+                    `Severity: ${card.severity}` :
+                    card.isUltimate ? 'Solves: Any Problem' : `Solves: ${card.solves.join(', ')}`;
+
+                cardElement.innerHTML = `
+                    <div class="card-type-badge">${cardType}</div>
+                    <div class="card-header">${card.name}</div>
+                    <div class="card-icon">${card.icon}</div>
+                    <div class="card-description">${card.description}</div>
+                    <div class="card-footer">${footerText}</div>
+                `;
+
+                cardElement.addEventListener('click', () => selectCard(card, cardElement));
+                handContainer.appendChild(cardElement);
+
+                // Add deal animation
+                cardElement.style.animation = 'cardDeal 0.6s ease-out';
+                cardElement.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        function selectCard(card, cardElement) {
+            // Remove previous selection
+            document.querySelectorAll('.card.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            // Only allow selection of solution cards when there's a problem
+            if (!currentProblem) {
+                updateStatus('Draw a problem card first!', 'error');
+                return;
+            }
+
+            if (card.severity !== undefined) {
+                updateStatus('You can only play solution cards to solve problems!', 'error');
+                return;
+            }
+
+            cardElement.classList.add('selected');
+            selectedCard = card;
+
+            // Check if this solution can solve the current problem
+            const canSolve = card.isUltimate || card.solves.includes(currentProblem.id);
+
+            if (canSolve) {
+                updateStatus(`Great! ${card.name} can solve ${currentProblem.name}!`, 'success');
+                showEducationalPopup(card, currentProblem);
+
+                // Remove the played card and current problem
+                setTimeout(() => {
+                    playerHand = playerHand.filter(c => c !== card);
+                    currentProblem = null;
+                    document.getElementById('problemCard').innerHTML = '<div style="color: #bdc3c7; font-style: italic;">Draw a problem card</div>';
+                    renderHand();
+                    updateStatus('Well done! Draw more cards to continue playing.');
+                }, 2000);
+
+            } else {
+                updateStatus(`${card.name} cannot solve ${currentProblem.name}. Try another solution!`, 'error');
+            }
+        }
+
+        function showEducationalPopup(solution, problem) {
+            const popup = document.getElementById('educationalPopup');
+            const title = document.getElementById('popupTitle');
+            const content = document.getElementById('popupContent');
+
+            title.textContent = `✅ Perfect Solution!`;
+            content.innerHTML = `
+                <strong>${solution.name}</strong> successfully addresses <strong>${problem.name}</strong>!<br><br>
+                <em>💡 ${solution.educationalInfo}</em><br><br>
+                This demonstrates how environmental solutions can have multiple benefits and address interconnected problems.
+            `;
+
+            popup.classList.add('show');
+        }
+
+        function closePopup() {
+            document.getElementById('educationalPopup').classList.remove('show');
+        }
+
+        function clearHand() {
+            playerHand = [];
+            selectedCard = null;
+            renderHand();
+            updateStatus('Hand cleared!');
+        }
+
+        function newGame() {
+            deck = [...problemCards, ...solutionCards];
+            shuffleDeck();
+            playerHand = [];
+            currentProblem = null;
+            selectedCard = null;
+
+            document.getElementById('problemCard').innerHTML = '<div style="color: #bdc3c7; font-style: italic;">Draw a problem card</div>';
+            renderHand();
+            updateDeckCount();
+            updateStatus('New game started! Click the deck to draw cards.');
+        }
+
+        function showHelp() {
+            const popup = document.getElementById('educationalPopup');
+            const title = document.getElementById('popupTitle');
+            const content = document.getElementById('popupContent');
+
+            title.textContent = '🎮 How to Play';
+            content.innerHTML = `
+                <strong>Objective:</strong> Learn about environmental problems and their solutions!<br><br>
+                <strong>How to play:</strong><br>
+                1. Click the deck to draw cards<br>
+                2. Problem cards appear at the top<br>
+                3. Select solution cards from your hand<br>
+                4. Match solutions to problems using letter codes<br>
+                5. Ultimate cards can solve any problem!<br><br>
+                <em>Each correct match teaches you about environmental action!</em>
+            `;
+
+            popup.classList.add('show');
+        }
+
+        // Initialize game
+        createParticles();
+        newGame();
+    </script>
+</body>
+</html>
